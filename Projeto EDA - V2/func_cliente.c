@@ -393,6 +393,162 @@ void alterar_cliente() {
     }
 }
 
+// Função para listar alugueres de um determinado cliente
+void listar_aluguer_cliente(int id_cliente) {
+    FILE* txt_meios, * txt_clientes, * txt_registos;
+    registo r;
+    cliente c;
+    meio m;
+    int meio_id, cliente_id, registo_id;
+    char data[50];
+
+    // Abrir ficheiros em modo de escrita e leitura
+    txt_meios = fopen("meios.txt", "r");
+
+    if (txt_meios == NULL) {
+        system("clear || cls");
+        printf("Erro ao abrir arquivo!\n");
+        getchar();
+        exit(1);
+    }
+
+    // Ler todos os meios para uma lista ligada
+    meio* head_meio = NULL;
+    meio* curr_meio = NULL;
+    while (!feof(txt_meios)) {
+        meio* new_meio = (meio*)malloc(sizeof(meio));
+        fscanf(txt_meios, "%d %s %f %f %s %s %d\n", &(new_meio->id), new_meio->tipo, &(new_meio->custo), &(new_meio->bateria),
+            new_meio->distancia, new_meio->local, &(new_meio->reserva));
+        new_meio->seguinte = NULL;
+
+        if (head_meio == NULL) {
+            head_meio = new_meio;
+            curr_meio = new_meio;
+        }
+        else {
+            curr_meio->seguinte = new_meio;
+            curr_meio = new_meio;
+        }
+    }
+
+    fclose(txt_meios);
+
+    // Abrir ficheiros em modo de escrita e leitura
+    txt_clientes = fopen("clientes.txt", "r");
+    if (txt_clientes == NULL) {
+        system("clear || cls");
+        printf("Erro ao abrir arquivo!\n");
+        getchar();
+        exit(1);
+    }
+
+    // Ler todos os clientes para uma lista ligada
+    cliente* head = NULL;
+    cliente* curr = NULL;
+    while (!feof(txt_clientes)) {
+        cliente* new_cliente = (cliente*)malloc(sizeof(cliente));
+        fscanf(txt_clientes, "%d %s %d %s %f %s %s\n", &(new_cliente->id), new_cliente->nome, &(new_cliente->nif),
+            new_cliente->morada, &(new_cliente->saldo), new_cliente->utilizador, new_cliente->password);
+        new_cliente->seguinte = NULL;
+
+        if (head == NULL) {
+            head = new_cliente;
+        }
+        else {
+            curr->seguinte = new_cliente;
+        }
+        curr = new_cliente;
+    }
+
+    fclose(txt_clientes);
+
+    // Abrir ficheiros em modo de escrita e leitura
+    txt_registos = fopen("registos.txt", "ab+");
+    if (txt_registos == NULL) {
+        system("clear || cls");
+        printf("Erro ao abrir arquivo!\n");
+        getchar();
+        exit(1);
+    }
+
+    // Ler todos os registos para uma lista ligada
+    registo* head_registo = NULL;
+    registo* curr_registo = NULL;
+    while (!feof(txt_registos)) {
+        registo* new_registo = (registo*)malloc(sizeof(registo));
+        fscanf(txt_registos, "%d %d %d %s\n", &(new_registo->id), &(new_registo->cliente_id), &(new_registo->meio_id),
+            new_registo->data);
+        new_registo->seguinte = NULL;
+
+        if (head_registo == NULL) {
+            head_registo = new_registo;
+        }
+        else {
+            curr_registo->seguinte = new_registo;
+        }
+        curr_registo = new_registo;
+    }
+
+    fclose(txt_registos);
+
+    // Percorrer a lista de registos
+    curr_registo = head_registo;
+    while (curr_registo != NULL) {
+        // Verificar se o registo pertence ao cliente logado
+        if (curr_registo->cliente_id != id_cliente) {
+            curr_registo = curr_registo->seguinte;
+            continue;  // Saltar para a próxima iteração do ciclo while
+        }
+
+        // Procurar o nome do cliente na lista de clientes
+        cliente_id = curr_registo->cliente_id;
+        curr = head;
+        while (curr != NULL) {
+            if (curr->id == cliente_id) {
+                break;
+            }
+            curr = curr->seguinte;
+        }
+
+        // Procurar o nome do meio na lista de meios
+        meio_id = curr_registo->meio_id;
+        curr_meio = head_meio;
+        while (curr_meio != NULL) {
+            if (curr_meio->id == meio_id) {
+                break;
+            }
+            curr_meio = curr_meio->seguinte;
+        }
+
+        // Imprimir os dados do registo
+        printf("ID: %d\nCliente: %s\nMeio: %s\nData: %s\n\n", curr_registo->id, curr->nome, curr_meio->tipo, curr_registo->data);
+        curr_registo = curr_registo->seguinte;
+    }
+
+    // Libertar memória alocada para as listas ligadas
+    curr = head;
+    while (curr != NULL) {
+        cliente* temp = curr;
+        curr = curr->seguinte;
+        free(temp);
+    }
+
+    curr_meio = head_meio;
+    while (curr_meio != NULL) {
+        meio* temp = curr_meio;
+        curr_meio = curr_meio->seguinte;
+        free(temp);
+    }
+
+    curr_registo = head_registo;
+    while (curr_registo != NULL) {
+        registo* temp = curr_registo;
+        curr_registo = curr_registo->seguinte;
+        free(temp);
+    }
+    getchar();
+}
+
 // Menu para clientes
 void showMenuCliente(registo** headR) {
    
@@ -420,19 +576,19 @@ void showMenuCliente(registo** headR) {
             break;
 
         case 2:
-            printf("\CONSULTAR MEIO(S)\n\n");
-            printf("\nComo deseja ordenar a lista de meios?\n");
+            printf("\nCONSULTAR MEIO(S)\n\n");
+            printf("\nComo deseja ordenar a lista de meios?\n\n");
             printf("B - Por bateria\n");
             printf("D - Por distancia\n\n");
             printf("Opcao: ");
             scanf(" %c", &order_by);
             printf("\n\n");
-            listar_meio(order_by);
+            listar_meio_cliente(order_by);
             break;
 
         case 3:
             printf("\nCONSULTAR ALUGUER(ES)\n\n");
-            listar_aluguer_cliente();
+            listar_aluguer_cliente(id_cliente);
             break;
 
         case 4:
