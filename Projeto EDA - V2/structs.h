@@ -53,7 +53,6 @@ void loginGestor(gestor** head, meio** headM);
 void listar_gestor();
 void remover_gestor();
 void alterar_gestor();
-void listar_aluguer_gestor();
 
 // FUNÇÕES MEIO
 void registarMeio(meio** head);
@@ -63,8 +62,8 @@ void listar_meio(char order_by);
 
 // FUNÇÕES ALUGUER
 void registar_aluguer(int id_cliente, registo** head);
-int gerar_id_registo();
-int existe_id_registo(int id);
+void listar_aluguer();
+void cancelar_aluguer();
 
 // FUNÇÕES MENU
 void showMenu(cliente** headC, gestor** headG, meio** headM, registo** headR);

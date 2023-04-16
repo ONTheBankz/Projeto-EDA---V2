@@ -549,6 +549,73 @@ void listar_aluguer_cliente(int id_cliente) {
     getchar();
 }
 
+// Função para listar um meio
+void listar_meio_cliente(char order_by) {
+    // Open file in read mode
+    FILE* file = fopen("meios.txt", "r");
+    if (file == NULL) {
+        printf("Erro ao abrir arquivo!\n");
+        exit(1);
+    }
+
+    // Create array of meios
+    meio m[100];
+    int count = 0;
+    while (fscanf(file, "%d %s %f %f %s %s %d\n", &m[count].id, m[count].tipo, &m[count].custo, &m[count].bateria,
+        m[count].distancia, m[count].local, &m[count].reserva) != EOF) {
+        if (m[count].reserva == 1) {
+            continue; // Skip adding this meio to the array
+        }
+        count++;
+    }
+
+    // Order list
+    if (order_by == 'b') {
+        // Order list by bateria
+        for (int i = 0; i < count - 1; i++) {
+            for (int j = 0; j < count - i - 1; j++) {
+                if (m[j].bateria < m[j + 1].bateria) {
+                    meio temp = m[j];
+                    m[j] = m[j + 1];
+                    m[j + 1] = temp;
+                }
+            }
+        }
+    }
+    else if (order_by == 'd') {
+        // Order list by distancia
+        for (int i = 0; i < count - 1; i++) {
+            for (int j = 0; j < count - i - 1; j++) {
+                float dist1 = atof(m[j].distancia);
+                float dist2 = atof(m[j + 1].distancia);
+                if (dist1 > dist2) {
+                    meio temp = m[j];
+                    m[j] = m[j + 1];
+                    m[j + 1] = temp;
+                }
+            }
+        }
+    }
+
+    // Print list of meios
+    int printed_count = 0;
+    printf("Lista de meios:\n\n");
+    for (int i = 0; i < count; i++) {
+        if (m[i].reserva == 1) {
+            continue; // Skip this meio
+        }
+        printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nDistancia: %s\nLocal: %s\n\n", m[i].id, m[i].tipo,
+            m[i].custo, m[i].bateria, m[i].distancia, m[i].local);
+        printed_count++;
+    }
+    if (printed_count == 0) {
+        printf("Nao existem meios disponiveis no momento.\n");
+    }
+
+    fclose(file);
+    getchar();
+}
+
 // Menu para clientes
 void showMenuCliente(registo** headR) {
    
