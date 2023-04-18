@@ -67,7 +67,7 @@ gestor* lerGestor(FILE* f) {
 }
 
 // Função para fazer login (Gestor)
-void loginGestor(gestor** head, meio** headM) {
+void loginGestor(gestor** head, meio** headM, registo** headR) {
     char username[50];
     char password[50];
 
@@ -90,7 +90,7 @@ void loginGestor(gestor** head, meio** headM) {
             system("clear || cls");
             printf("Bem-vindo, %s!\n", curr->nome);
             getchar();
-            showMenuGestor(headM);
+            showMenuGestor(headM, headR);
             if (prev != NULL) {
                 prev->seguinte = curr->seguinte;
                 curr->seguinte = *head;
@@ -364,8 +364,377 @@ void alterar_gestor() {
     }
 }
 
+// Função para alugar um meio
+void registar_aluguer_gestor(registo** headR) {
+    FILE* txt_meios, * bin_meios, * txt_clientes, * bin_clientes, * txt_registos, * bin_registos, * txt_historico, * bin_historico;
+    registo r;
+    cliente c;
+    meio m;
+    int id_registo = 0;
+    int id, id_cliente, meio_id, cliente_id, registo_id;
+    int clientes, meios;
+    int custo;
+    char data_temp[50];
+    char data[50];
+
+    time_t t = time(NULL);
+    struct tm* tm = localtime(&t);
+    sprintf(data, "%02d/%02d/%04d", tm->tm_mday, tm->tm_mon + 1, tm->tm_year + 1900);
+
+    // Abrir ficheiros em modo de escrita e leitura
+    txt_meios = fopen("meios.txt", "r");
+    bin_meios = fopen("meios.bin", "ab+");
+    if (txt_meios == NULL || bin_meios == NULL) {
+        system("clear || cls");
+        printf("Erro ao abrir arquivo!\n");
+        getchar();
+        exit(1);
+    }
+    
+    // Abrir ficheiros em modo de escrita e leitura
+    txt_clientes = fopen("clientes.txt", "r");
+    bin_clientes = fopen("clientes.bin", "ab+");
+    if (txt_clientes == NULL || bin_clientes == NULL) {
+        system("clear || cls");
+        printf("Erro ao abrir arquivo!\n");
+        getchar();
+        exit(1);
+    }
+
+    // Ler todos os meios para uma lista ligada
+    meio* head_meio = NULL;
+    meio* curr_meio = NULL;
+    while (!feof(txt_meios)) {
+        meio* new_meio = (meio*)malloc(sizeof(meio));
+        fscanf(txt_meios, "%d %s %f %f %s %s %d\n", &(new_meio->id), new_meio->tipo, &(new_meio->custo), &(new_meio->bateria),
+            new_meio->distancia, new_meio->local, &(new_meio->reserva));
+        new_meio->seguinte = NULL;
+
+        if (head_meio == NULL) {
+            head_meio = new_meio;
+            curr_meio = new_meio;
+        }
+        else {
+            curr_meio->seguinte = new_meio;
+            curr_meio = new_meio;
+        }
+    }
+
+    fclose(txt_meios);
+
+    // Ler todos os clientes para uma lista ligada
+    cliente* head = NULL;
+    cliente* curr = NULL;
+    while (!feof(txt_clientes)) {
+        cliente* new_cliente = (cliente*)malloc(sizeof(cliente));
+        fscanf(txt_clientes, "%d %s %d %s %f %s %s\n", &(new_cliente->id), new_cliente->nome, &(new_cliente->nif),
+            new_cliente->morada, &(new_cliente->saldo), new_cliente->utilizador, new_cliente->password);
+        new_cliente->seguinte = NULL;
+
+        if (head == NULL) {
+            head = new_cliente;
+        }
+        else {
+            curr->seguinte = new_cliente;
+        }
+        curr = new_cliente;
+    }
+
+    fclose(txt_clientes);
+
+    // Escrever lista de meios
+    printf("Lista de meios:\n\n");
+    curr_meio = head_meio;
+    while (curr_meio != NULL) {
+        if (curr_meio->reserva != 1) {
+            printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nDistancia: %s\nLocal: %s\n\n", curr_meio->id,
+                curr_meio->tipo, curr_meio->custo, curr_meio->bateria, curr_meio->distancia, curr_meio->local);
+        }
+        curr_meio = curr_meio->seguinte;
+    }
+
+    // Pedir ao user o ID do meio que quer alugar
+    printf("Introduza o ID do meio que pretende alugar: ");
+        scanf("%d", &meio_id);
+    system("clear || cls");
+
+        // Escrever lista de clientes
+        printf("Lista de clientes:\n\n");
+        curr = head;
+        while (curr != NULL) {
+            printf("ID: %d\nNome: %s\nNIF: %d\nMorada: %s\nSaldo: %.2f\nUtilizador: %s\nPassword: %s\n\n", curr->id,
+                    curr->nome, curr->nif, curr->morada, curr->saldo, curr->utilizador, curr->password);
+                    curr = curr->seguinte;
+        }
+
+    printf("Introduza o ID do cliente que pretende efetuar o registo: ");
+        scanf("%d", &id_cliente);
+
+    // Procurar o meio com o ID escolhido
+    curr_meio = head_meio;
+    while (curr_meio != NULL && curr_meio->id != meio_id) {
+        curr_meio = curr_meio->seguinte;
+    }
+
+    // Verificar se o meio foi encontrado
+    if (curr_meio == NULL) {
+        system("clear || cls");
+        printf("Meio com ID %d nao encontrado!\n", meio_id);
+        getchar();
+        return;
+    }
+
+    // Adicionar 1 ao campo "reserva" do meio
+    curr_meio->reserva = 1;
+    custo = curr_meio->custo;
+
+    // Escrever a lista atualizada de meios de volta para o arquivo de texto
+    txt_meios = fopen("meios.txt", "w");
+    if (txt_meios == NULL) {
+        system("clear || cls");
+        printf("Erro ao abrir arquivo!\n");
+        getchar();
+        exit(1);
+    }
+
+    curr_meio = head_meio;
+    while (curr_meio != NULL) {
+        fprintf(txt_meios, "%d %s %.2f %.2f %s %s %d\n", curr_meio->id, curr_meio->tipo, curr_meio->custo, curr_meio->bateria,
+            curr_meio->distancia, curr_meio->local, curr_meio->reserva);
+        curr_meio = curr_meio->seguinte;
+    }
+
+    fclose(txt_meios);
+
+    // Escrever a lista atualizada de meios de volta para o arquivo binário
+    bin_meios = fopen("meios.bin", "wb");
+    if (bin_meios == NULL) {
+        system("clear || cls");
+        printf("Erro ao abrir arquivo!\n");
+        getchar();
+        exit(1);
+    }
+
+    curr_meio = head_meio;
+    while (curr_meio != NULL) {
+        fwrite(curr_meio, sizeof(meio), 1, bin_meios);
+        curr_meio = curr_meio->seguinte;
+    }
+
+    fclose(bin_meios);
+
+    // Procurar o cliente com o ID escolhido
+    curr = head;
+    while (curr != NULL && curr->id != id_cliente) {
+        curr = curr->seguinte;
+    }
+
+    // Subtrair o custo do saldo do cliente
+    curr->saldo -= custo;
+
+    // Escrever a lista atualizada de clientes de volta para o arquivo de texto
+    txt_clientes = fopen("clientes.txt", "w");
+    if (txt_clientes == NULL) {
+        system("clear || cls");
+        printf("Erro ao abrir arquivo!\n");
+        getchar();
+        exit(1);
+    }
+
+    curr = head;
+    while (curr != NULL) {
+        fprintf(txt_clientes, "%d %s %d %s %.2f %s %s\n", curr->id, curr->nome, curr->nif, curr->morada,
+            curr->saldo, curr->utilizador, curr->password);
+        curr = curr->seguinte;
+    }
+
+    fclose(txt_clientes);
+
+    // Escrever a lista atualizada de clientes de volta para o arquivo binário
+    bin_clientes = fopen("clientes.bin", "wb");
+    if (bin_clientes == NULL) {
+        system("clear || cls");
+        printf("Erro ao abrir arquivo!\n");
+        getchar();
+        exit(1);
+    }
+
+    curr = head;
+    while (curr != NULL) {
+        fwrite(curr, sizeof(cliente), 1, bin_clientes);
+        curr = curr->seguinte;
+    }
+
+    fclose(bin_clientes);
+
+    // Alocar memória para um novo registo
+    registo* new_registo = (registo*)malloc(sizeof(registo));
+
+    // Abrir o ficheiro de registos para leitura em modo append
+    txt_registos = fopen("registos.txt", "a+");
+    if (txt_registos == NULL) {
+        printf("Erro ao abrir o ficheiro registos.txt\n");
+        return;
+    }
+    bin_registos = fopen("registos.bin", "ab");
+    if (bin_registos == NULL) {
+        printf("Erro ao abrir o ficheiro registos.bin\n");
+        return;
+    }
+
+    // Encontrar o último ID presente no ficheiro e incrementá-lo
+    while (fscanf(txt_registos, "%d %d %d %s\n", &id_registo, &clientes, &meios, data_temp) != EOF) {
+    }
+    id_registo++; // Incrementar o último ID encontrado
+    fclose(txt_registos); // Fechar o ficheiro
+
+    // Preencher os campos do novo cliente
+    new_registo->id = id_registo;
+    new_registo->cliente_id = id_cliente;
+    new_registo->meio_id = meio_id;
+    strcpy(new_registo->data, data);
+
+    // Colocar o próximo pointer no topo da lista
+    new_registo->seguinte = *headR;
+    *headR = new_registo;
+
+    // Escrever os valores do cliente no ficheiro de texto
+    txt_registos = fopen("registos.txt", "a");
+    fprintf(txt_registos, "%d %d %d %s\n", new_registo->id, new_registo->cliente_id, new_registo->meio_id,
+        new_registo->data);
+    fclose(txt_registos);
+
+    // Escrever os valores do cliente no ficheiro binário
+    fwrite(new_registo, sizeof(registo), 1, bin_registos);
+    fclose(bin_registos);
+
+    // Abrir o ficheiro de histórico para escrita em modo append
+    txt_historico = fopen("historico.txt", "a");
+    if (txt_historico == NULL) {
+        printf("Erro ao abrir o ficheiro historico.txt\n");
+        return;
+    }
+
+    bin_historico = fopen("historico.bin", "ab");
+    if (bin_historico == NULL) {
+        printf("Erro ao abrir o ficheiro historico.bin\n");
+        return;
+    }
+
+    // Escrever os valores do cliente no ficheiro de texto
+    fprintf(txt_historico, "%d %d %d %s\n", new_registo->id, new_registo->cliente_id, new_registo->meio_id,
+        new_registo->data);
+    fclose(txt_historico);
+
+    // Escrever os valores do cliente no ficheiro binário
+    fwrite(new_registo, sizeof(registo), 1, bin_historico);
+    fclose(bin_historico);
+
+    system("clear || cls");
+    printf("Aluguer registado com sucesso!\n");
+    getchar();
+}
+
+// Função para carregar o saldo de um cliente
+void carregar_saldo_gestor() {
+    FILE* txt_clientes, * bin_clientes;
+    float valor;
+    int id_cliente;
+
+    // Abrir ficheiros em modo de leitura
+    txt_clientes = fopen("clientes.txt", "r");
+    if (txt_clientes == NULL) {
+        system("clear || cls");
+        printf("Erro ao abrir arquivo!\n");
+        getchar();
+        exit(1);
+    }
+
+    // Ler todos os clientes para uma lista ligada
+    cliente* head = NULL;
+    cliente* curr = NULL;
+    while (!feof(txt_clientes)) {
+        cliente* new_cliente = (cliente*)malloc(sizeof(cliente));
+        fscanf(txt_clientes, "%d %s %d %s %f %s %s\n", &(new_cliente->id), new_cliente->nome, &(new_cliente->nif),
+            new_cliente->morada, &(new_cliente->saldo), new_cliente->utilizador, new_cliente->password);
+        new_cliente->seguinte = NULL;
+
+        if (head == NULL) {
+            head = new_cliente;
+        }
+        else {
+            curr->seguinte = new_cliente;
+        }
+        curr = new_cliente;
+    }
+
+    fclose(txt_clientes);
+
+    // Escrever lista de clientes
+    printf("Lista de clientes:\n\n");
+    curr = head;
+    while (curr != NULL) {
+        printf("ID: %d\nNome: %s\nNIF: %d\nMorada: %s\nSaldo: %.2f\nUtilizador: %s\nPassword: %s\n\n", curr->id,
+            curr->nome, curr->nif, curr->morada, curr->saldo, curr->utilizador, curr->password);
+        curr = curr->seguinte;
+    }
+
+    // Pedir ao utilizador para introduzir o ID do cliente
+    printf("Digite o ID do cliente: ");
+    scanf("%d", &id_cliente);
+
+    // Percorrer a lista ligada para encontrar o cliente com o id = id_cliente
+    curr = head;
+    while (curr != NULL && curr->id != id_cliente) {
+        curr = curr->seguinte;
+    }
+
+    if (curr == NULL) {
+        system("clear || cls");
+        printf("O cliente com o ID %d nao existe!\n", id_cliente);
+        getchar();
+        exit(1);
+    }
+
+    printf("\nSaldo atual: %.2f\n", curr->saldo);
+    printf("\nDigite o valor a carregar: ");
+    scanf("%f", &valor);
+    curr->saldo += valor;
+    system("clear || cls");
+    printf("Saldo atual: %.2f\n", curr->saldo);
+    getchar();
+
+    // Atualizar o ficheiro de clientes com a nova lista de clientes
+    txt_clientes = fopen("clientes.txt", "w");
+    curr = head;
+    while (curr != NULL) {
+        fprintf(txt_clientes, "%d %s %d %s %.2f %s %s\n", curr->id, curr->nome, curr->nif, curr->morada,
+            curr->saldo, curr->utilizador, curr->password);
+        curr = curr->seguinte;
+    }
+
+    fclose(txt_clientes);
+
+    // Atualizar o ficheiro binario de clientes com a nova lista de clientes
+    bin_clientes = fopen("clientes.bin", "wb");
+    curr = head;
+    while (curr != NULL) {
+        fwrite(curr, sizeof(cliente), 1, bin_clientes);
+        curr = curr->seguinte;
+    }
+    fclose(bin_clientes);
+
+    // Libertar memória alocada para as listas ligadas
+    curr = head;
+    while (curr != NULL) {
+        cliente* temp = curr;
+        curr = curr->seguinte;
+        free(temp);
+    }
+}
+
 // Menu Gestor
-void showMenuGestor(meio** headM) {
+void showMenuGestor(meio** headM, registo** headR) {
     int opcao;
     char order_by;
     do {
@@ -376,22 +745,24 @@ void showMenuGestor(meio** headM) {
         printf("Escolha uma opcao:\n");
         printf("1 - Listar cliente\n");
         printf("2 - Remover cliente\n");
-        printf("3 - Alterar dados cliente\n\n");
+        printf("3 - Alterar dados cliente\n");
+        printf("4 - Carregar saldo cliente\n\n");
         printf("GESTORES\n\n");
         printf("Escolha uma opcao:\n");
-        printf("4 - Listar gestor\n");
-        printf("5 - Remover gestor\n");
-        printf("6 - Alterar dados gestor\n\n");
+        printf("5 - Listar gestor\n");
+        printf("6 - Remover gestor\n");
+        printf("7 - Alterar dados gestor\n\n");
         printf("MEIOS TRANSPORTE\n\n");
         printf("Escolha uma opcao:\n");
-        printf("7 - Registar meio\n");
-        printf("8 - Listar meio\n");
-        printf("9 - Remover meio\n");
-        printf("10 - Alterar dados meio\n\n");
+        printf("8 - Registar meio\n");
+        printf("9 - Listar meio\n");
+        printf("10 - Remover meio\n");
+        printf("11 - Alterar dados meio\n\n");
         printf("ALUGUERES\n\n");
         printf("Escolha uma opcao:\n");
-        printf("11 - Listar registos aluguer\n");
-        printf("12 - Cancelar Aluguer\n\n");
+        printf("12 - Registar novo aluguer\n");
+        printf("13 - Listar registos aluguer\n");
+        printf("14 - Cancelar Aluguer\n\n");
         printf("OUTROS\n\n");
         printf("Escolha uma opcao:\n");
         printf("0 - Sair\n");
@@ -419,29 +790,35 @@ void showMenuGestor(meio** headM) {
 
         case 4:
             system("clear || cls");
+            printf("\nCARREGAR SALDO\n\n");
+            carregar_saldo_gestor();
+            break;
+
+        case 5:
+            system("clear || cls");
             printf("\nLISTAR GESTOR\n\n");
             listar_gestor();
             break;
 
-        case 5:
+        case 6:
             system("clear || cls");
             printf("\nREMOVER GESTOR\n\n");         
             remover_gestor();
             break;
 
-        case 6:
+        case 7:
             system("clear || cls");
             printf("\nALTERAR DADOS GESTOR\n\n");
             alterar_gestor();
             break;
 
-        case 7:
+        case 8:
             system("clear || cls");
             printf("\nREGISTAR MEIO\n\n");
             registarMeio(headM);
             break;
 
-        case 8:
+        case 9:
             system("clear || cls");
             printf("\nLISTAR MEIO\n\n");
             printf("\nComo deseja ordenar a lista de meios?\n");
@@ -453,27 +830,33 @@ void showMenuGestor(meio** headM) {
             listar_meio(order_by);
             break;
  
-        case 9:
+        case 10:
             system("clear || cls");
             printf("\nREMOVER MEIO\n\n");
             remover_meio();
             break;
 
-        case 10:
+        case 11:
             system("clear || cls");
             printf("\nALTERAR DADOS MEIO\n\n");
             alterar_meio();
             break;
+        
+        case 12:
+            system("clear || cls");
+            printf("\nREGISTAR ALUGUER\n\n");
+            registar_aluguer_gestor(headR);
+            break;
 
-        case 11:
+        case 13:
             system("clear || cls");
             printf("\nLISTAR ALUGUER\n\n");
             listar_aluguer();
             break;
 
-        case 12:
+        case 14:
             system("clear || cls");
-            printf("\nLISTAR ALUGUER\n\n");
+            printf("\CANCELAR ALUGUER\n\n");
             cancelar_aluguer();
             break;
 

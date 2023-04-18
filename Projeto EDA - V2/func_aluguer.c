@@ -565,7 +565,7 @@ void cancelar_aluguer() {
                 if (curr->id == cliente_id) {
                     // Incrementar o saldo do cliente pelo custo do meio
                     curr->saldo += curr_meio->custo;
-                    break; 
+                    break;
                 }
                 curr = curr->seguinte;
             }
@@ -586,7 +586,7 @@ void cancelar_aluguer() {
             curr_registo = head_registo;
             while (curr_registo != NULL) {
                 fprintf(txt_registos, "%d %d %d %s\n", curr_registo->id, curr_registo->cliente_id,
-                curr_registo->meio_id, curr_registo->data);
+                    curr_registo->meio_id, curr_registo->data);
                 curr_registo = curr_registo->seguinte;
             }
 
@@ -596,8 +596,8 @@ void cancelar_aluguer() {
             txt_meios = freopen("meios.txt", "wb", txt_meios);
             curr_meio = head_meio;
             while (curr_meio != NULL) {
-                fprintf(txt_registos, "%d %s %.2f %.2f %s %s %d\n", curr_meio->id, curr_meio->tipo, curr_meio->custo, 
-                curr_meio->bateria, curr_meio->distancia, curr_meio->local, curr_meio->reserva);
+                fprintf(txt_registos, "%d %s %.2f %.2f %s %s %d\n", curr_meio->id, curr_meio->tipo, curr_meio->custo,
+                    curr_meio->bateria, curr_meio->distancia, curr_meio->local, curr_meio->reserva);
                 curr_meio = curr_meio->seguinte;
             }
 
@@ -607,12 +607,13 @@ void cancelar_aluguer() {
             txt_clientes = freopen("clientes.txt", "wb", txt_clientes);
             curr = head;
             while (curr != NULL) {
-                fprintf(txt_clientes, "%d %s %d %s %.2f %s %s\n", curr->id, curr->nome, curr->nif, curr->morada, 
-                curr->saldo, curr->utilizador, curr->password);
+                fprintf(txt_clientes, "%d %s %d %s %.2f %s %s\n", curr->id, curr->nome, curr->nif, curr->morada,
+                    curr->saldo, curr->utilizador, curr->password);
                 curr = curr->seguinte;
             }
 
             fclose(txt_clientes);
+
             system("clear || cls");
             printf("Aluguer cancelado com sucesso!\n");
             getchar();
@@ -623,61 +624,61 @@ void cancelar_aluguer() {
         curr_registo = curr_registo->seguinte;
     }
 
-            // Atualizar o ficheiro de registos com a nova lista de registos
-            bin_registos = fopen("registos.bin", "wb");
-            curr_registo = head_registo;
-            while (curr_registo != NULL) {
-                fwrite(curr_registo, sizeof(registo), 1, bin_registos);
-                curr_registo = curr_registo->seguinte;
-            }
-
-            fclose(bin_registos);
-
-            // Atualizar o ficheiro de meios com a nova lista de meios
-            bin_meios = fopen("meios.bin", "wb");
-            curr_meio = head_meio;
-            while (curr_meio != NULL) {
-                fwrite(curr_meio, sizeof(meio), 1, bin_meios);
-                curr_meio = curr_meio->seguinte;
-            }
-
-            fclose(bin_meios);
-
-            // Atualizar o ficheiro de clientes com a nova lista de clientes
-            bin_clientes = fopen("clientes.bin", "wb");
-            curr = head;
-            while (curr != NULL) {
-                fwrite(curr, sizeof(cliente), 1, bin_clientes);
-                curr = curr->seguinte;
-            }
-
-            fclose(bin_clientes);
-
-            system("clear || cls");
-            printf("Aluguer nao encontrado.\n");
-            getchar();
-
-        // Libertar memória alocada para as listas ligadas
-        curr = head;
-        while (curr != NULL) {
-            cliente* temp = curr;
-            curr = curr->seguinte;
-            free(temp);
-        }
-
-        curr_meio = head_meio;
-        while (curr_meio != NULL) {
-            meio* temp = curr_meio;
-            curr_meio = curr_meio->seguinte;
-            free(temp);
-        }
-
-        curr_registo = head_registo;
-        while (curr_registo != NULL) {
-            registo* temp = curr_registo;
-            curr_registo = curr_registo->seguinte;
-            free(temp);
-        }
+    // Atualizar o ficheiro de registos com a nova lista de registos
+    bin_registos = fopen("registos.bin", "wb");
+    curr_registo = head_registo;
+    while (curr_registo != NULL) {
+        fwrite(curr_registo, sizeof(registo), 1, bin_registos);
+        curr_registo = curr_registo->seguinte;
     }
+
+    fclose(bin_registos);
+
+    // Atualizar o ficheiro de meios com a nova lista de meios
+    bin_meios = fopen("meios.bin", "wb");
+    curr_meio = head_meio;
+    while (curr_meio != NULL) {
+        fwrite(curr_meio, sizeof(meio), 1, bin_meios);
+        curr_meio = curr_meio->seguinte;
+    }
+
+    fclose(bin_meios);
+
+    // Atualizar o ficheiro de clientes com a nova lista de clientes
+    bin_clientes = fopen("clientes.bin", "wb");
+    curr = head;
+    while (curr != NULL) {
+        fwrite(curr, sizeof(cliente), 1, bin_clientes);
+        curr = curr->seguinte;
+    }
+
+    fclose(bin_clientes);
+
+    system("clear || cls");
+    printf("Aluguer nao encontrado.\n");
+    getchar();
+
+    // Libertar memória alocada para as listas ligadas
+    curr_registo = head_registo;
+    while (curr_registo != NULL) {
+        registo* temp = curr_registo;
+        curr_registo = curr_registo->seguinte;
+        free(temp);
+    }
+
+    curr_meio = head_meio;
+    while (curr_meio != NULL) {
+        meio* temp = curr_meio;
+        curr_meio = curr_meio->seguinte;
+        free(temp);
+    }
+
+    curr = head;
+    while (curr != NULL) {
+        cliente* temp = curr;
+        curr = curr->seguinte;
+        free(temp);
+    }
+}
 
 

@@ -1,3 +1,3 @@
-1 Bike 12.00 60.00 5km Braga 0
-2 Skate 8.00 40.00 13km Barcelos 0
+1 Bike 12.00 60.00 5km Braga 1
+2 Skate 8.00 40.00 13km Barcelos 1
 3 Troti 5.00 20.00 8km Porto 1

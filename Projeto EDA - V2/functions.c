@@ -42,7 +42,7 @@ void showMenu(cliente** headC, gestor** headG, meio** headM, registo** headR) {
         case 4:
             system("clear || cls");
             printf("\nLOGIN DO GESTOR\n\n");           
-            loginGestor(headG, headM);
+            loginGestor(headG, headM, headR);
             break;
             
         case 0:

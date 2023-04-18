@@ -40,11 +40,13 @@ typedef struct registo {
 void registarCliente(cliente** head);
 cliente* lerCliente(FILE* f);
 void loginCliente(cliente** head, registo** headR);
-void remover_cliente();
 void listar_cliente();
+void remover_cliente();
 void alterar_cliente();
 void listar_aluguer_cliente(id_cliente);
 void listar_meio_cliente(char order_by);
+void cancelar_aluguer_cliente(id_cliente);
+void carregar_saldo(id_cliente);
 
 // FUN합ES GESTOR
 void registarGestor(gestor** head);
@@ -53,12 +55,14 @@ void loginGestor(gestor** head, meio** headM);
 void listar_gestor();
 void remover_gestor();
 void alterar_gestor();
+void carregar_saldo_gestor();
+void registar_aluguer_gestor(registo** headR);
 
 // FUN합ES MEIO
 void registarMeio(meio** head);
+void listar_meio(char order_by);
 void remover_meio();
 void alterar_meio();
-void listar_meio(char order_by);
 
 // FUN합ES ALUGUER
 void registar_aluguer(int id_cliente, registo** head);
@@ -67,5 +71,5 @@ void cancelar_aluguer();
 
 // FUN합ES MENU
 void showMenu(cliente** headC, gestor** headG, meio** headM, registo** headR);
-void showMenuGestor(meio** headM);
+void showMenuGestor(meio** headM, registo** headR);
 void showMenuCliente(registo** headR);
