@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "structs.h"
 
 int id_cliente = 0;
@@ -122,7 +123,7 @@ void loginCliente(cliente** head, registo** headR) {
 }
 
 // Função para listar um cliente
-void listar_cliente() {
+void listarCliente() {
     int id;
     // Abre o ficheiro em modo read
     FILE* file = fopen("clientes.txt", "r");
@@ -144,7 +145,7 @@ void listar_cliente() {
 }
 
 // Função para remover um cliente
-void remover_cliente() {
+void removerCliente() {
     int id;
 
     // Abrir ficheiros em modo de escrita e leitura
@@ -253,7 +254,7 @@ void remover_cliente() {
 }
 
 // Função para alterar um cliente
-void alterar_cliente() {
+void alterarCliente() {
     int id;
 
     // Abrir ficheiro em modo leitura
@@ -394,14 +395,14 @@ void alterar_cliente() {
 }
 
 // Função para listar alugueres de um determinado cliente
-void listar_aluguer_cliente(int id_cliente) {
+void listarAluguerCliente(int id_cliente) {
     FILE* txt_meios, * txt_clientes, * txt_registos;
     registo r;
     cliente c;
     meio m;
     int meio_id, cliente_id, registo_id;
     char data[50];
-
+    
     // Abrir ficheiros em modo de leitura
     txt_meios = fopen("meios.txt", "r");
 
@@ -476,8 +477,8 @@ void listar_aluguer_cliente(int id_cliente) {
     registo* curr_registo = NULL;
     while (!feof(txt_registos)) {
         registo* new_registo = (registo*)malloc(sizeof(registo));
-        fscanf(txt_registos, "%d %d %d %s\n", &(new_registo->id), &(new_registo->cliente_id), &(new_registo->meio_id),
-            new_registo->data);
+        fscanf(txt_registos, "%d %d %d %d/%d/%d %d:%d\n", &(new_registo->id), &(new_registo->cliente_id), &(new_registo->meio_id),
+            &(new_registo->dia), &(new_registo->mes), &(new_registo->ano), &(new_registo->horas), &(new_registo->minutos));
         new_registo->seguinte = NULL;
 
         if (head_registo == NULL) {
@@ -521,7 +522,8 @@ void listar_aluguer_cliente(int id_cliente) {
         }
 
         // Imprimir os dados do registo
-        printf("ID: %d\nCliente: %s\nMeio: %s\nData: %s\n\n", curr_registo->id, curr->nome, curr_meio->tipo, curr_registo->data);
+        printf("ID: %d\nCliente: %s\nMeio: %s\nData: %d/%d/%d %d:%d\n\n", curr_registo->id, curr->nome, curr_meio->tipo, 
+        curr_registo->dia, curr_registo->mes, curr_registo->ano, curr_registo->horas, curr_registo->minutos);
         curr_registo = curr_registo->seguinte;
     }
 
@@ -550,7 +552,7 @@ void listar_aluguer_cliente(int id_cliente) {
 }
 
 // Função para listar um meio
-void listar_meio_cliente(char order_by) {
+void listarMeioCliente(char order_by) {
     // Open file in read mode
     FILE* file = fopen("meios.txt", "r");
     if (file == NULL) {
@@ -617,13 +619,16 @@ void listar_meio_cliente(char order_by) {
 }
 
 // Função para cancelar um aluguer de um determinado cliente
-void cancelar_aluguer_cliente(int id_cliente) {
+void terminarAluguer(int id_cliente) {
     FILE* txt_meios, * txt_clientes, * txt_registos, * bin_meios, * bin_clientes, * bin_registos;
     registo r;
     cliente c;
     meio m;
     int meio_id, cliente_id, registo_id;
-    char data[50];
+ 
+    // Get the current time
+    time_t now = time(NULL);
+    struct tm* current_time = localtime(&now);
 
     // Abrir ficheiros em modo de leitura
     txt_meios = fopen("meios.txt", "r");
@@ -699,8 +704,8 @@ void cancelar_aluguer_cliente(int id_cliente) {
     registo* curr_registo = NULL;
     while (!feof(txt_registos)) {
         registo* new_registo = (registo*)malloc(sizeof(registo));
-        fscanf(txt_registos, "%d %d %d %s\n", &(new_registo->id), &(new_registo->cliente_id), &(new_registo->meio_id),
-            new_registo->data);
+        fscanf(txt_registos, "%d %d %d %d/%d/%d %d:%d\n", &(new_registo->id), &(new_registo->cliente_id), &(new_registo->meio_id),
+            &(new_registo->dia), &(new_registo->mes), &(new_registo->ano), &(new_registo->horas), &(new_registo->minutos));
         new_registo->seguinte = NULL;
 
         if (head_registo == NULL) {
@@ -742,7 +747,8 @@ void cancelar_aluguer_cliente(int id_cliente) {
         }
 
         // Imprimir os dados do registo
-        printf("ID: %d\nCliente: %s\nMeio: %s\nData: %s\n\n", curr_registo->id, curr->nome, curr_meio->tipo, curr_registo->data);
+        printf("ID: %d\nCliente: %s\nMeio: %s\nData: %d/%d/%d %d:%d\n\n", curr_registo->id, curr->nome, curr_meio->tipo,
+            curr_registo->dia, curr_registo->mes, curr_registo->ano, curr_registo->horas, curr_registo->minutos);
         curr_registo = curr_registo->seguinte;
     }
 
@@ -755,6 +761,7 @@ void cancelar_aluguer_cliente(int id_cliente) {
     registo* prev_registo = NULL;
     while (curr_registo != NULL) {
         if (curr_registo->id == registo_id) {
+    int minutes_difference = ((current_time->tm_hour * 60) + current_time->tm_min) - ((curr_registo->horas * 60) + curr_registo->minutos);
             // Encontrar o meio com o ID associado ao registo
             meio_id = curr_registo->meio_id;
             cliente_id = curr_registo->cliente_id;
@@ -771,7 +778,7 @@ void cancelar_aluguer_cliente(int id_cliente) {
             while (curr != NULL) {
                 if (curr->id == cliente_id) {
                     // Incrementar o saldo do cliente pelo custo do meio
-                    curr->saldo += curr_meio->custo;
+                    curr->saldo -= (curr_meio->custo * minutes_difference);
                     break;
                 }
                 curr = curr->seguinte;
@@ -792,8 +799,8 @@ void cancelar_aluguer_cliente(int id_cliente) {
             txt_registos = freopen("registos.txt", "wb", txt_registos);
             curr_registo = head_registo;
             while (curr_registo != NULL) {
-                fprintf(txt_registos, "%d %d %d %s\n", curr_registo->id, curr_registo->cliente_id,
-                    curr_registo->meio_id, curr_registo->data);
+                fprintf(txt_registos, "%d %d %d %d/%d/%d %d:%d\n", curr_registo->id, curr_registo->cliente_id, curr_registo->meio_id,
+                curr_registo->dia, curr_registo->mes, curr_registo->ano, curr_registo->horas, curr_registo->minutos);
                 curr_registo = curr_registo->seguinte;
             }
 
@@ -889,7 +896,7 @@ void cancelar_aluguer_cliente(int id_cliente) {
 }
 
 // Função para carregar o saldo do cliente
-void carregar_saldo(int id_cliente) {
+void carregarSaldo(int id_cliente) {
     FILE * txt_clientes, * bin_clientes;
     float valor;
 
@@ -978,7 +985,7 @@ void showMenuCliente(registo** headR) {
         printf("1 - Alugar meios transporte\n");
         printf("2 - Consultar meios diponiveis\n");
         printf("3 - Consultar aluguer(es)\n");
-        printf("4 - Cancelar aluguer(es)\n");
+        printf("4 - Terminar aluguer(es)\n");
         printf("5 - Carregar Saldo\n\n");
         printf("OUTROS\n\n");
         printf("Escolha uma opcao:\n");
@@ -989,7 +996,7 @@ void showMenuCliente(registo** headR) {
         switch (opcao) {
         case 1:
             printf("\nALUGAR MEIO(S) TRANSPORTE(S)\n\n");
-            registar_aluguer(id_cliente, headR);
+            RegistarAluguer(id_cliente, headR);
             break;
 
         case 2:
@@ -1000,22 +1007,22 @@ void showMenuCliente(registo** headR) {
             printf("Opcao: ");
             scanf(" %c", &order_by);
             printf("\n\n");
-            listar_meio_cliente(order_by);
+            listarMeioCliente(order_by);
             break;
 
         case 3:
             printf("\nCONSULTAR ALUGUER(ES)\n\n");
-            listar_aluguer_cliente(id_cliente);
+            listarAluguerCliente(id_cliente);
             break;
 
         case 4:
-            printf("\nCANCELAR ALUGUER\n\n");
-            cancelar_aluguer_cliente(id_cliente);
+            printf("\nTERMINAR ALUGUER\n\n");
+            terminarAluguer(id_cliente);
             break;
 
         case 5:
             printf("\nCARREGAR SALDO\n\n");
-            carregar_saldo(id_cliente);
+            carregarSaldo(id_cliente);
             break;
 
         case 0:

@@ -109,7 +109,7 @@ void loginGestor(gestor** head, meio** headM, registo** headR) {
 }
 
 // Função para listar um gestor
-void listar_gestor() {
+void listarGestor() {
     int id;
 // Abre o ficheiro em modo read
     FILE* file = fopen("gestores.txt", "r");
@@ -130,7 +130,7 @@ void listar_gestor() {
 }
 
 // Função para remover gestor por ID
-void remover_gestor() {
+void removerGestor() {
     int id;
 
     // Abrir ficheiros em modo de escrita e leitura
@@ -237,7 +237,7 @@ void remover_gestor() {
 }
 
 // Função para alterar um gestor
-void alterar_gestor() {
+void alterarGestor() {
     int id;
 
     // Abrir ficheiro em modo leitura
@@ -365,7 +365,7 @@ void alterar_gestor() {
 }
 
 // Função para alugar um meio
-void registar_aluguer_gestor(registo** headR) {
+void registarAluguerGestor(registo** headR) {
     FILE* txt_meios, * bin_meios, * txt_clientes, * bin_clientes, * txt_registos, * bin_registos, * txt_historico, * bin_historico;
     registo r;
     cliente c;
@@ -374,12 +374,21 @@ void registar_aluguer_gestor(registo** headR) {
     int id, id_cliente, meio_id, cliente_id, registo_id;
     int clientes, meios;
     int custo;
-    char data_temp[50];
-    char data[50];
+    int dia_temp, mes_temp, ano_temp, hora_temp, min_temp;
 
-    time_t t = time(NULL);
-    struct tm* tm = localtime(&t);
-    sprintf(data, "%02d/%02d/%04d", tm->tm_mday, tm->tm_mon + 1, tm->tm_year + 1900);
+    // Get the current time
+    time_t current_time;
+    struct tm* local_time;
+    char datetime[20];
+    char hourtime[20];
+    current_time = time(NULL);
+    local_time = localtime(&current_time);
+
+    int dia = local_time->tm_mday;
+    int mes = local_time->tm_mon + 1;
+    int ano = local_time->tm_year + 1900;
+    int hora = local_time->tm_hour;
+    int minuto = local_time->tm_min;
 
     // Abrir ficheiros em modo de escrita e leitura
     txt_meios = fopen("meios.txt", "r");
@@ -486,8 +495,7 @@ void registar_aluguer_gestor(registo** headR) {
 
     // Adicionar 1 ao campo "reserva" do meio
     curr_meio->reserva = 1;
-    custo = curr_meio->custo;
-
+   
     // Escrever a lista atualizada de meios de volta para o arquivo de texto
     txt_meios = fopen("meios.txt", "w");
     if (txt_meios == NULL) {
@@ -528,9 +536,6 @@ void registar_aluguer_gestor(registo** headR) {
     while (curr != NULL && curr->id != id_cliente) {
         curr = curr->seguinte;
     }
-
-    // Subtrair o custo do saldo do cliente
-    curr->saldo -= custo;
 
     // Escrever a lista atualizada de clientes de volta para o arquivo de texto
     txt_clientes = fopen("clientes.txt", "w");
@@ -583,16 +588,34 @@ void registar_aluguer_gestor(registo** headR) {
     }
 
     // Encontrar o último ID presente no ficheiro e incrementá-lo
-    while (fscanf(txt_registos, "%d %d %d %s\n", &id_registo, &clientes, &meios, data_temp) != EOF) {
+    txt_registos = fopen("registos.txt", "a+");
+    if (txt_registos == NULL) {
+        printf("Erro ao abrir o ficheiro registos.txt\n");
+        return;
     }
-    id_registo++; // Incrementar o último ID encontrado
+    if (fscanf(txt_registos, "%d %d %d %d/%d/%d %d:%d\n", &id_registo, &clientes, &meios, &dia_temp, &mes_temp, &ano_temp,
+        &hora_temp, &min_temp) == EOF) {
+        // File is empty, set ID to 1
+        id_registo = 1;
+    }
+    else {
+        // File is not empty, find the last ID and increment it
+        while (fscanf(txt_registos, "%d %d %d %d/%d/%d %d:%d\n", &id_registo, &clientes, &meios, &dia_temp, &mes_temp, &ano_temp,
+            &hora_temp, &min_temp) != EOF) {
+        }
+            id_registo++;
+    }
     fclose(txt_registos); // Fechar o ficheiro
 
     // Preencher os campos do novo cliente
     new_registo->id = id_registo;
     new_registo->cliente_id = id_cliente;
     new_registo->meio_id = meio_id;
-    strcpy(new_registo->data, data);
+    new_registo->dia = dia;
+    new_registo->mes = mes;
+    new_registo->ano = ano;
+    new_registo->horas = hora;
+    new_registo->minutos = minuto;
 
     // Colocar o próximo pointer no topo da lista
     new_registo->seguinte = *headR;
@@ -600,8 +623,8 @@ void registar_aluguer_gestor(registo** headR) {
 
     // Escrever os valores do cliente no ficheiro de texto
     txt_registos = fopen("registos.txt", "a");
-    fprintf(txt_registos, "%d %d %d %s\n", new_registo->id, new_registo->cliente_id, new_registo->meio_id,
-        new_registo->data);
+    fprintf(txt_registos, "%d %d %d %d/%d/%d %d:%d\n", new_registo->id, new_registo->cliente_id, new_registo->meio_id,
+        new_registo->dia, new_registo->mes, new_registo->ano, new_registo->horas, new_registo->minutos);
     fclose(txt_registos);
 
     // Escrever os valores do cliente no ficheiro binário
@@ -622,8 +645,8 @@ void registar_aluguer_gestor(registo** headR) {
     }
 
     // Escrever os valores do cliente no ficheiro de texto
-    fprintf(txt_historico, "%d %d %d %s\n", new_registo->id, new_registo->cliente_id, new_registo->meio_id,
-        new_registo->data);
+    fprintf(txt_historico, "%d %d %d %d/%d/%d %d:%d\n", new_registo->id, new_registo->cliente_id, new_registo->meio_id,
+        new_registo->dia, new_registo->mes, new_registo->ano, new_registo->horas, new_registo->minutos);
     fclose(txt_historico);
 
     // Escrever os valores do cliente no ficheiro binário
@@ -636,7 +659,7 @@ void registar_aluguer_gestor(registo** headR) {
 }
 
 // Função para carregar o saldo de um cliente
-void carregar_saldo_gestor() {
+void carregarSaldoGestor() {
     FILE* txt_clientes, * bin_clientes;
     float valor;
     int id_cliente;
@@ -773,43 +796,43 @@ void showMenuGestor(meio** headM, registo** headR) {
         case 1:
             system("clear || cls");
             printf("\nLISTAR CLIENTE\n\n");
-            listar_cliente();
+            listarCliente();
             break;
 
         case 2:
             system("clear || cls");
             printf("\nREMOVER CLIENTE\n\n");
-            remover_cliente();
+            removerCliente();
             break;
 
         case 3:
             system("clear || cls");
             printf("\nALTERAR DADOS CLIENTE\n\n");
-            alterar_cliente();
+            alterarCliente();
             break;
 
         case 4:
             system("clear || cls");
             printf("\nCARREGAR SALDO\n\n");
-            carregar_saldo_gestor();
+            carregarSaldoGestor();
             break;
 
         case 5:
             system("clear || cls");
             printf("\nLISTAR GESTOR\n\n");
-            listar_gestor();
+            listarGestor();
             break;
 
         case 6:
             system("clear || cls");
             printf("\nREMOVER GESTOR\n\n");         
-            remover_gestor();
+            removerGestor();
             break;
 
         case 7:
             system("clear || cls");
             printf("\nALTERAR DADOS GESTOR\n\n");
-            alterar_gestor();
+            alterarGestor();
             break;
 
         case 8:
@@ -827,37 +850,37 @@ void showMenuGestor(meio** headM, registo** headR) {
             printf("Opcao: ");
             scanf(" %c", &order_by);
             printf("\n\n");
-            listar_meio(order_by);
+            listarMeio(order_by);
             break;
  
         case 10:
             system("clear || cls");
             printf("\nREMOVER MEIO\n\n");
-            remover_meio();
+            removerMeio();
             break;
 
         case 11:
             system("clear || cls");
             printf("\nALTERAR DADOS MEIO\n\n");
-            alterar_meio();
+            alterarMeio();
             break;
         
         case 12:
             system("clear || cls");
             printf("\nREGISTAR ALUGUER\n\n");
-            registar_aluguer_gestor(headR);
+            registarAluguerGestor(headR);
             break;
 
         case 13:
             system("clear || cls");
             printf("\nLISTAR ALUGUER\n\n");
-            listar_aluguer();
+            ListarAluguer();
             break;
 
         case 14:
             system("clear || cls");
             printf("\CANCELAR ALUGUER\n\n");
-            cancelar_aluguer();
+            CancelarAluguer();
             break;
 
         case 0:

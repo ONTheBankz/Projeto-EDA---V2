@@ -32,7 +32,11 @@ typedef struct registo {
     int id;
     int cliente_id;
     int meio_id;
-    char data[50];
+    int dia;
+    int mes;
+    int ano;
+    int horas;
+    int minutos;
     struct registo* seguinte;
 } registo;
 
@@ -40,34 +44,34 @@ typedef struct registo {
 void registarCliente(cliente** head);
 cliente* lerCliente(FILE* f);
 void loginCliente(cliente** head, registo** headR);
-void listar_cliente();
-void remover_cliente();
-void alterar_cliente();
-void listar_aluguer_cliente(id_cliente);
-void listar_meio_cliente(char order_by);
-void cancelar_aluguer_cliente(id_cliente);
-void carregar_saldo(id_cliente);
+void listarCliente();
+void removerCliente();
+void alterarCliente();
+void listarAluguerCliente(id_cliente);
+void listarMeioCliente(char order_by);
+void terminarAluguer(id_cliente);
+void carregarSaldo(id_cliente);
 
 // FUN합ES GESTOR
 void registarGestor(gestor** head);
 gestor* lerGestor(FILE* f);
 void loginGestor(gestor** head, meio** headM);
-void listar_gestor();
-void remover_gestor();
-void alterar_gestor();
-void carregar_saldo_gestor();
-void registar_aluguer_gestor(registo** headR);
+void listarGestor();
+void removerGestor();
+void alterarGestor();
+void carregarSaldoGestor();
+void registarAluguerGestor(registo** headR);
 
 // FUN합ES MEIO
 void registarMeio(meio** head);
-void listar_meio(char order_by);
-void remover_meio();
-void alterar_meio();
+void listarMeio(char order_by);
+void removerMeio();
+void alterarMeio();
 
 // FUN합ES ALUGUER
-void registar_aluguer(int id_cliente, registo** head);
-void listar_aluguer();
-void cancelar_aluguer();
+void RegistarAluguer(int id_cliente, registo** head);
+void ListarAluguer();
+void CancelarAluguer();
 
 // FUN합ES MENU
 void showMenu(cliente** headC, gestor** headG, meio** headM, registo** headR);

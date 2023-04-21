@@ -78,7 +78,7 @@ void registarMeio(meio** head) {
 }
 
 // Função para listar um meio
-void listar_meio(char order_by) {
+void listarMeio(char order_by) {
     // Open file in read mode
     FILE* file = fopen("meios.txt", "r");
     if (file == NULL) {
@@ -134,7 +134,7 @@ void listar_meio(char order_by) {
 }
 
 // Função para remover um meio
-void remover_meio() {
+void removerMeio() {
 
         int id;
 
@@ -244,7 +244,7 @@ void remover_meio() {
     }
 
 // Função para alterar um meio
-void alterar_meio() {
+void alterarMeio() {
     int id;
 
     // Abrir ficheiro em modo leitura
