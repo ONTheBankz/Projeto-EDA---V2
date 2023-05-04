@@ -77,16 +77,69 @@ void registarMeio(meio** head) {
     getchar();
 }
 
+// Função para passar os meios para uma lista ligada
+void lerMeios(FILE* f, meio** head) {
+    meio* current = NULL;
+    while (!feof(f)) {
+        meio* new_meio = (meio*)malloc(sizeof(meio));
+        fscanf(f, "%d %s %f %f %s %s %d\n", &(new_meio->id), new_meio->tipo, &(new_meio->custo), 
+                &(new_meio->bateria), new_meio->distancia, new_meio->local, &(new_meio->reserva));
+        new_meio->seguinte = NULL;
+        if (*head == NULL) {
+            *head = new_meio;
+            current = new_meio;
+        }
+        else {
+            current->seguinte = new_meio;
+            current = new_meio;
+        }
+    }
+}
+
+// Função para atualizar os meios no ficheiro
+void atualizarMeio(FILE** f, meio* head_meio) {
+    // Abre o ficheiro para atualizar os valores
+    *f = fopen("meios.txt", "wb");
+    meio* curr_meio = head_meio;
+
+    // Escreve os conteúdos de cada categoria
+    while (curr_meio != NULL) {
+        fprintf(*f, "%d %s %.2f %.2f %s %s %d\n", curr_meio->id, curr_meio->tipo, curr_meio->custo,
+            curr_meio->bateria, curr_meio->distancia, curr_meio->local, curr_meio->reserva);
+        curr_meio = curr_meio->seguinte;
+    }
+
+    fclose(*f);
+}
+
+// Função para atualizar os meios no binário
+void atualizarBinMeio(FILE** f, meio* head_meio) {
+    f = fopen("meios.bin", "wb");
+    if (f == NULL) {
+        printf("Erro ao abrir arquivo!\n");
+        getchar();
+        exit(1);
+    }
+
+    meio* curr_meio = head_meio;
+    while (curr_meio != NULL) {
+        fwrite(curr_meio, sizeof(meio), 1, f);
+        curr_meio = curr_meio->seguinte;
+    }
+
+    fclose(f);
+}
+
 // Função para listar um meio
 void listarMeio(char order_by) {
-    // Open file in read mode
+    // Abrir ficheiro em modo leitura
     FILE* file = fopen("meios.txt", "r");
     if (file == NULL) {
         printf("Erro ao abrir arquivo!\n");
         exit(1);
     }
 
-    // Create array of meios
+    // Criar array de meios
     meio m[100];
     int count = 0;
     while (fscanf(file, "%d %s %f %f %s %s %d\n", &m[count].id, m[count].tipo, &m[count].custo, &m[count].bateria,
@@ -94,9 +147,9 @@ void listarMeio(char order_by) {
         count++;
     }
 
-    // Order list
+    // Lista de ordenação
     if (order_by == 'b') {
-        // Order list by bateria
+        // Ordenar por bateria
         for (int i = 0; i < count - 1; i++) {
             for (int j = 0; j < count - i - 1; j++) {
                 if (m[j].bateria < m[j + 1].bateria) {
@@ -108,7 +161,7 @@ void listarMeio(char order_by) {
         }
     }
     else if (order_by == 'd') {
-        // Order list by distancia
+        // Ordenar por distância
         for (int i = 0; i < count - 1; i++) {
             for (int j = 0; j < count - i - 1; j++) {
                 float dist1 = atof(m[j].distancia);
@@ -122,7 +175,7 @@ void listarMeio(char order_by) {
         }
     }
 
-    // Print list of meios
+    // Mostrar lista de meios
     printf("Lista de meios:\n\n");
     for (int i = 0; i < count; i++) {
         printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nDistancia: %s\nLocal: %s\n\n", m[i].id, m[i].tipo,
@@ -135,7 +188,6 @@ void listarMeio(char order_by) {
 
 // Função para remover um meio
 void removerMeio() {
-
         int id;
 
         // Abrir ficheiros em modo de escrita e leitura
@@ -151,21 +203,7 @@ void removerMeio() {
         // Ler todos os meios para uma lista ligada
         meio* head = NULL;
         meio* curr = NULL;
-        while (!feof(txt_file)) {
-            meio* new_meio = (meio*)malloc(sizeof(meio));
-            fscanf(txt_file, "%d %s %f %f %s %s %d\n", &(new_meio->id), new_meio->tipo, &(new_meio->custo), 
-                &(new_meio->bateria), new_meio->distancia, new_meio->local, &(new_meio->reserva));
-                new_meio->seguinte = NULL;
-
-            if (head == NULL) {
-                head = new_meio;
-            }
-            else {
-                curr->seguinte = new_meio;
-            }
-            curr = new_meio;
-        }
-
+        lerMeios(txt_file, &head);
         fclose(txt_file);
 
         // Escrever lista de meios
@@ -204,39 +242,12 @@ void removerMeio() {
             }
             free(curr);
 
-            // Escrever a lista atualizada de meios de volta para o arquivo de texto
-            txt_file = fopen("meios.txt", "w");
-            if (txt_file == NULL) {
-                system("clear || cls");
-                printf("Erro ao abrir arquivo!\n");
-                getchar();
-                exit(1);
-            }
+            // atualizar os meios no ficheiro
+            atualizarMeio(&txt_file, head);
 
-            curr = head;
-            while (curr != NULL) {
-                fprintf(txt_file, "%d %s %.2f %.2f %s %s %d\n", curr->id, curr->tipo, curr->custo, curr->bateria, 
-                    curr->distancia, curr->local, curr->reserva);
-                    curr = curr->seguinte;
-            }
+            // atualizar os meios no binário
+            atualizarBinMeio(&txt_file, head);
 
-            fclose(txt_file);
-
-            // Escrever a lista atualizada de meios de volta para o arquivo binário
-            bin_file = fopen("meios.bin", "wb");
-            if (bin_file == NULL) {
-                system("clear || cls");
-                printf("Erro ao abrir arquivo!\n");
-                getchar();
-                exit(1);
-            }
-            curr = head;
-            while (curr != NULL) {
-                fwrite(curr, sizeof(meio), 1, bin_file);
-                curr = curr->seguinte;
-            }
-
-            fclose(bin_file);
             system("clear || cls");
             printf("Meio com ID %d removido com sucesso!\n", id);
             getchar();
@@ -260,22 +271,7 @@ void alterarMeio() {
     // Ler todos os meios para uma lista ligada
     meio* head = NULL;
     meio* curr = NULL;
-    while (!feof(file)) {
-
-        meio* new_meio = (meio*)malloc(sizeof(meio));
-        fscanf(file, "%d %s %f %f %s %s %d\n", &(new_meio->id), new_meio->tipo, &(new_meio->custo), &(new_meio->bateria), 
-            new_meio->distancia, new_meio->local, &(new_meio->reserva));
-            new_meio->seguinte = NULL;
-
-        if (head == NULL) {
-            head = new_meio;
-        }
-        else {
-            curr->seguinte = new_meio;
-        }
-        curr = new_meio;
-    }
-
+    lerMeios(file, &head);
     fclose(file);
 
     // Escrever lista de meios
@@ -336,39 +332,11 @@ void alterarMeio() {
 
         } while (strcmp(campo, "fim") != 0);
 
-        // Escrever a lista atualizada de meios no arquivo
-        file = fopen("meios.txt", "w");
-        if (file == NULL) {
-            system("clear || cls");
-            printf("Erro ao abrir arquivo!\n");
-            getchar();
-            exit(1);
-        }
+        // atualizar os meios no ficheiro
+        atualizarMeio(&file, head);
 
-        curr = head;
-        while (curr != NULL) {
-            fprintf(file, "%d %s %.2f %.2f %s %s %d\n", curr->id, curr->tipo, curr->custo, curr->bateria, curr->distancia,
-                curr->local, curr->reserva);
-                curr = curr->seguinte;
-        }
-
-        fclose(file);
-
-        // Escrever a lista atualizada de meios de volta para o arquivo binário
-        bin_file = fopen("meios.bin", "wb");
-        if (bin_file == NULL) {
-            system("clear || cls");
-            printf("Erro ao abrir arquivo!\n");
-            getchar();
-            exit(1);
-        }
-        curr = head;
-        while (curr != NULL) {
-            fwrite(curr, sizeof(meio), 1, bin_file);
-            curr = curr->seguinte;
-        }
-
-        fclose(bin_file);
+        // atualizar os meios no ficheiro
+        atualizarBinMeio(&file, head);
 
         system("clear || cls");
         printf("Meio com ID %d alterado com sucesso!\n", id);

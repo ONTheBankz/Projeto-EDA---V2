@@ -43,6 +43,9 @@ typedef struct registo {
 // FUN합ES CLIENTE
 void registarCliente(cliente** head);
 cliente* lerCliente(FILE* f);
+void lerClientes(FILE* f, cliente** head);
+void atualizarCliente(FILE** f, cliente* head);
+void atualizarBinCliente(FILE** f, cliente* head);
 void loginCliente(cliente** head, registo** headR);
 void listarCliente();
 void removerCliente();
@@ -55,6 +58,9 @@ void carregarSaldo(id_cliente);
 // FUN합ES GESTOR
 void registarGestor(gestor** head);
 gestor* lerGestor(FILE* f);
+void lerGestores(FILE* f, gestor** head);
+void atualizarGestor(FILE** f, gestor* head);
+void atualizarBinGestor(FILE** f, gestor* head);
 void loginGestor(gestor** head, meio** headM);
 void listarGestor();
 void removerGestor();
@@ -65,13 +71,19 @@ void registarAluguerGestor(registo** headR);
 // FUN합ES MEIO
 void registarMeio(meio** head);
 void listarMeio(char order_by);
+void lerMeios(FILE* f, meio** head);
+void atualizarMeio(FILE** f, meio* head_meio);
+void atualizarBinMeio(FILE** f, meio* head_meio);
 void removerMeio();
 void alterarMeio();
 
 // FUN합ES ALUGUER
-void RegistarAluguer(int id_cliente, registo** head);
-void ListarAluguer();
-void CancelarAluguer();
+void registarAluguer(int id_cliente, registo** head);
+void lerAluguer(FILE* f, registo** head);
+void atualizarAluguer(FILE** f, registo* head_registo);
+void atualizarBinAluguer(FILE** f, registo* head_registo);
+void listarAluguer();
+void cancelarAluguer();
 
 // FUN합ES MENU
 void showMenu(cliente** headC, gestor** headG, meio** headM, registo** headR);
