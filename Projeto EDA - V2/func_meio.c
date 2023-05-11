@@ -17,13 +17,15 @@ void registarMeio(meio** head) {
     }
     int id = 0;
     int reserva;
-    char tipo[50], distancia[50], local[50];
+    char tipo[50], distancia[50], local[50], local_grafo[50];
     float custo, bateria;
 
     // Encontrar o último ID presente no ficheiro e incrementá-lo
-    while (fscanf(f, "%d %s %f %f %s %s %d\n", &id, tipo, &custo, &bateria, distancia, local, &reserva) != EOF) {
+    while (fscanf(f, "%d %s %f %f %s %s %d\n", &id, tipo, &custo, &bateria, local, 
+        local_grafo, &reserva) != EOF) {
 
     }
+
     id++;  // Incrementar o último ID encontrado
     fclose(f); // Fechar o ficheiro
 
@@ -39,38 +41,37 @@ void registarMeio(meio** head) {
     printf("Digite a bateria do meio: ");
     scanf("%f", &novo_meio->bateria);
 
-    printf("Digite a distancia do meio: ");
-    scanf("%s", novo_meio->distancia);
-
     printf("Digite o local do meio: ");
     scanf("%s", novo_meio->local);
+
+    printf("Digite o local do meio (geocodigo): ");
+    scanf("%s", novo_meio->local_grafo);
 
     // Colocar o próximo pointer no topo da lista
     novo_meio->seguinte = *head;
     *head = novo_meio;
 
     // Escrever os valores do gestor no ficheiro de texto
-    FILE* file = fopen("meios.txt", "a");
-    if (file == NULL) {
+        f = fopen("meios.txt", "a");
+    if (f == NULL) {
         printf("Erro ao abrir arquivo!\n");
         exit(1);
     }
 
-    fprintf(file, "%d %s %.2f %.2f %s %s %d\n", novo_meio->id, novo_meio->tipo, novo_meio->custo,
-        novo_meio->bateria, novo_meio->distancia, novo_meio->local, novo_meio->reserva);
+    fprintf(f, "%d %s %.2f %.2f %s %s %d\n", novo_meio->id, novo_meio->tipo, novo_meio->custo,
+        novo_meio->bateria, novo_meio->local, novo_meio->local_grafo, novo_meio->reserva);
 
-    fclose(file);
+    fclose(f);
 
     // Escrever os valores do gestor no ficheiro binário
-    FILE* binary_file = fopen("meios.bin", "ab");
-    if (binary_file == NULL) {
+    FILE* bin_meio = fopen("meios.bin", "ab");
+    if (bin_meio == NULL) {
         printf("Erro ao abrir arquivo binário!\n");
         exit(1);
     }
 
-    fwrite(novo_meio, sizeof(meio), 1, binary_file);
-
-    fclose(binary_file);
+    fwrite(novo_meio, sizeof(meio), 1, bin_meio);
+    fclose(bin_meio);
 
     system("clear || cls");
     printf("Meio registrado com sucesso!\n");
@@ -83,7 +84,8 @@ void lerMeios(FILE* f, meio** head) {
     while (!feof(f)) {
         meio* new_meio = (meio*)malloc(sizeof(meio));
         fscanf(f, "%d %s %f %f %s %s %d\n", &(new_meio->id), new_meio->tipo, &(new_meio->custo), 
-                &(new_meio->bateria), new_meio->distancia, new_meio->local, &(new_meio->reserva));
+                &(new_meio->bateria), new_meio->local, new_meio->local_grafo, 
+                &(new_meio->reserva));
         new_meio->seguinte = NULL;
         if (*head == NULL) {
             *head = new_meio;
@@ -105,7 +107,7 @@ void atualizarMeio(FILE** f, meio* head_meio) {
     // Escreve os conteúdos de cada categoria
     while (curr_meio != NULL) {
         fprintf(*f, "%d %s %.2f %.2f %s %s %d\n", curr_meio->id, curr_meio->tipo, curr_meio->custo,
-            curr_meio->bateria, curr_meio->distancia, curr_meio->local, curr_meio->reserva);
+            curr_meio->bateria, curr_meio->local, curr_meio->local_grafo, curr_meio->reserva);
         curr_meio = curr_meio->seguinte;
     }
 
@@ -133,17 +135,16 @@ void atualizarBinMeio(FILE** f, meio* head_meio) {
 // Função para listar um meio
 void listarMeio(char order_by) {
     // Abrir ficheiro em modo leitura
-    FILE* file = fopen("meios.txt", "r");
-    if (file == NULL) {
+    FILE* txt_meio = fopen("meios.txt", "r");
+    if (txt_meio == NULL) {
         printf("Erro ao abrir arquivo!\n");
         exit(1);
     }
-
     // Criar array de meios
     meio m[100];
     int count = 0;
-    while (fscanf(file, "%d %s %f %f %s %s %d\n", &m[count].id, m[count].tipo, &m[count].custo, &m[count].bateria,
-        m[count].distancia, m[count].local, &m[count].reserva) != EOF) {
+    while (fscanf(txt_meio, "%d %s %f %f %s %s %d\n", &m[count].id, m[count].tipo, &m[count].custo, &m[count].bateria,
+        m[count].local, m[count].local_grafo, &m[count].reserva) != EOF) {
         count++;
     }
 
@@ -160,29 +161,15 @@ void listarMeio(char order_by) {
             }
         }
     }
-    else if (order_by == 'd') {
-        // Ordenar por distância
-        for (int i = 0; i < count - 1; i++) {
-            for (int j = 0; j < count - i - 1; j++) {
-                float dist1 = atof(m[j].distancia);
-                float dist2 = atof(m[j + 1].distancia);
-                if (dist1 > dist2) {
-                    meio temp = m[j];
-                    m[j] = m[j + 1];
-                    m[j + 1] = temp;
-                }
-            }
-        }
-    }
-
+    
     // Mostrar lista de meios
     printf("Lista de meios:\n\n");
     for (int i = 0; i < count; i++) {
-        printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nDistancia: %s\nLocal: %s\n\n", m[i].id, m[i].tipo,
-            m[i].custo, m[i].bateria, m[i].distancia, m[i].local);
+        printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nLocal: %s\nGeocodigo: %s\nReserva: %d\n\n", 
+            m[i].id, m[i].tipo, m[i].custo, m[i].bateria, m[i].local, m[i].local_grafo, m[i].reserva);
     }
 
-    fclose(file);
+    fclose(txt_meio);
     getchar();
 }
 
@@ -210,8 +197,9 @@ void removerMeio() {
         printf("Lista de meios:\n\n");
         curr = head;
         while (curr != NULL) {
-            printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nDistancia: %s\nLocal: %s\nReserva: %d\n\n", curr->id,
-                curr->tipo, curr->custo, curr->bateria, curr->distancia, curr->local, curr->reserva);
+        printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nLocal: %s\nGeocodigo: %s\nReserva: %d\n\n", 
+                curr->id, curr->tipo, curr->custo, curr->bateria, curr->local, curr->local_grafo, 
+                curr->reserva);
                 curr = curr->seguinte;
         }
 
@@ -278,8 +266,9 @@ void alterarMeio() {
     printf("Lista de meios:\n\n");
     curr = head;
     while (curr != NULL) {
-        printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nDistancia: %s\nLocal: %s\nReserva: %d\n\n", curr->id,
-            curr->tipo, curr->custo, curr->bateria, curr->distancia, curr->local, curr->reserva);
+    printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nLocal: %s\nGeocodigo: %s\nReserva: %d\n\n", 
+            curr->id, curr->tipo, curr->custo, curr->bateria, curr->local, curr->local_grafo, 
+            curr->reserva);
             curr = curr->seguinte;
     }
 
@@ -304,7 +293,7 @@ void alterarMeio() {
         // Alterar o meio com o ID escolhido
         char campo[20], novo_valor[50];
         do {
-            printf("Digite o campo a alterar (tipo, custo, bateria, distancia, local, reserva), ou 'fim' para terminar: ");
+            printf("Digite o campo a alterar (tipo, custo, bateria, local, geocodigo ou reserva), ou 'fim' para terminar: ");
             scanf("%s", campo);
             if (strcmp(campo, "fim") == 0) {
                 break;
@@ -319,12 +308,12 @@ void alterarMeio() {
             }
             else if (strcmp(campo, "bateria") == 0) {
                 curr->bateria = atof(novo_valor);
-            }
-            else if (strcmp(campo, "distancia") == 0) {
-                strcpy(curr->distancia, novo_valor);
-            }
+            }           
             else if (strcmp(campo, "local") == 0) {
                 strcpy(curr->local, novo_valor);
+            }
+            else if (strcmp(campo, "geocodigo") == 0) {
+                strcpy(curr->local_grafo, novo_valor);
             }
             else if (strcmp(campo, "reserva") == 0) {
                 curr->reserva = atoi(novo_valor);

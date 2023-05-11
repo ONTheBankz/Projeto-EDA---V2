@@ -131,6 +131,7 @@
     <ClCompile Include="func_aluguer.c" />
     <ClCompile Include="func_cliente.c" />
     <ClCompile Include="func_gestor.c" />
+    <ClCompile Include="func_grafo.c" />
     <ClCompile Include="func_meio.c" />
     <ClCompile Include="main.c" />
   </ItemGroup>

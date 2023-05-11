@@ -1,3 +1,4 @@
-1 Bike 0.40 60.00 5km Braga 0
-2 Skate 0.30 40.00 13km Barcelos 0
-3 Troti 0.20 20.00 8km Porto 0
+1 Bike 0.40 60.00 Braga indios.poda.levo 0
+2 Skate 0.30 40.00 Braga incineradora.cabine.cantor 0
+3 Troti 0.20 20.00 Braga cigana.pardal.organizativo 0
+4 Trotinete 0.30 50.00 Braga jardim.st.barb 0

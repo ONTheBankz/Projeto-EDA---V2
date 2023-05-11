@@ -52,8 +52,8 @@ void registarAluguer(int id_cliente, registo** headR) {
     curr_meio = head_meio;
     while (curr_meio != NULL) {
         if (curr_meio->reserva != 1) {
-            printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nDistancia: %s\nLocal: %s\n\n", curr_meio->id,
-                curr_meio->tipo, curr_meio->custo, curr_meio->bateria, curr_meio->distancia, curr_meio->local);
+            printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nLocal: %s\n\n", curr_meio->id,
+                curr_meio->tipo, curr_meio->custo, curr_meio->bateria, curr_meio->local);
         }
         curr_meio = curr_meio->seguinte;
     }
@@ -134,15 +134,15 @@ void registarAluguer(int id_cliente, registo** headR) {
         printf("Erro ao abrir o ficheiro registos.txt\n");
         return;
     }
-    if (fscanf(txt_registos, "%d %d %d %d/%d/%d %d:%d\n", &id_registo, &clientes, &meios, &dia_temp, &mes_temp, &ano_temp,
-        &hora_temp, &min_temp) == EOF) {
+    if (fscanf(txt_registos, "%d %d %d %d/%d/%d %d:%d\n", &id_registo, &clientes, &meios, &dia_temp, &mes_temp, 
+        &ano_temp, &hora_temp, &min_temp) == EOF) {
         // Ficheiro está vazio, id registo fica a 1
             id_registo = 1;
     }
     else {
         // Ficheiro não está vazio, incrementa ao valor anterior
-        while (fscanf(txt_registos, "%d %d %d %d/%d/%d %d:%d\n", &id_registo, &clientes, &meios, &dia_temp, &mes_temp, &ano_temp,
-            &hora_temp, &min_temp) != EOF) {
+        while (fscanf(txt_registos, "%d %d %d %d/%d/%d %d:%d\n", &id_registo, &clientes, &meios, &dia_temp, &mes_temp, 
+            &ano_temp, &hora_temp, &min_temp) != EOF) {
         }
             id_registo++;
     }
@@ -204,9 +204,14 @@ void lerAluguer(FILE* f, registo** head) {
     registo* current = NULL;
     while (!feof(f)) {
         registo* new_registo = (registo*)malloc(sizeof(registo));
-        fscanf(f, "%d %d %d %d/%d/%d %d:%d\n", &(new_registo->id), &(new_registo->cliente_id), &(new_registo->meio_id),
-            &(new_registo->dia), &(new_registo->mes), &(new_registo->ano), &(new_registo->horas), &(new_registo->minutos));
+        int result = fscanf(f, "%d %d %d %d/%d/%d %d:%d\n", &(new_registo->id), &(new_registo->cliente_id), 
+            &(new_registo->meio_id), &(new_registo->dia), &(new_registo->mes), &(new_registo->ano), 
+            &(new_registo->horas), &(new_registo->minutos));
         new_registo->seguinte = NULL;
+        if (result != 8) {
+            free(new_registo);
+            break;
+        }
         if (*head == NULL) {
             *head = new_registo;
             current = new_registo;
@@ -215,6 +220,10 @@ void lerAluguer(FILE* f, registo** head) {
             current->seguinte = new_registo;
             current = new_registo;
         }
+    }
+    if (*head == NULL) {
+        system("clear || cls");
+        printf("Nao existem registos de aluguer disponiveis.\n");
     }
 }
 
@@ -445,7 +454,7 @@ void cancelarAluguer() {
     }
 
     // Pedir ao utilizador o ID do registo a ser removido
-    printf("Insira o ID do aluguer que deseja cancelar: ");
+    printf("\nInsira o ID do aluguer que deseja cancelar: ");
     scanf("%d", &registo_id);
 
     // Percorrer a lista de registos para encontrar o registo a ser removido

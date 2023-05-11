@@ -26,12 +26,13 @@ void registarCliente(cliente** head) {
     }
 
     int id = 0;
-    char nome[50], morada[50], utilizador[50], password[50];
+    char nome[50], morada[50], local_grafo[50], utilizador[50], password[50];
     int nif;
     float saldo;
 
     // Encontrar o último ID presente no ficheiro e incrementá-lo
-    while (fscanf(f_txt, "%d %s %d %s %f %s %s\n", &id, nome, &nif, morada, &saldo, utilizador, password) != EOF) {
+    while (fscanf(f_txt, "%d %s %d %s %s %f %s %s\n", &id, nome, &nif, morada, local_grafo, &saldo,
+        utilizador, password) != EOF) {
     }
     id++; // Incrementar o último ID encontrado
     fclose(f_txt); // Fechar o ficheiro
@@ -44,6 +45,8 @@ void registarCliente(cliente** head) {
     scanf("%d", &(new_cliente->nif));
     printf("Morada: ");
     scanf("%s", new_cliente->morada);
+    printf("Geocodigo: ");
+    scanf("%s", new_cliente->local_grafo);
     printf("Saldo: ");
     scanf("%f", &(new_cliente->saldo));
     printf("Utilizador: ");
@@ -56,12 +59,14 @@ void registarCliente(cliente** head) {
     *head = new_cliente;
 
     // Escrever os valores do cliente no ficheiro de texto
-    f_txt = fopen("clientes.txt", "a");
-    fprintf(f_txt, "%d %s %d %s %.2f %s %s\n", new_cliente->id, new_cliente->nome, new_cliente->nif,
-        new_cliente->morada, new_cliente->saldo, new_cliente->utilizador, new_cliente->password);
+        f_txt = fopen("clientes.txt", "a");
+    fprintf(f_txt, "%d %s %d %s %s %.2f %s %s\n", new_cliente->id, new_cliente->nome, new_cliente->nif,
+        new_cliente->morada, new_cliente->local_grafo, new_cliente->saldo, new_cliente->utilizador,
+        new_cliente->password);
     fclose(f_txt);
 
     // Escrever os valores do cliente no ficheiro binário
+        f_bin = fopen("clientes.bin", "ab");
     fwrite(new_cliente, sizeof(cliente), 1, f_bin);
     fclose(f_bin);
 
@@ -73,8 +78,9 @@ void registarCliente(cliente** head) {
 // Função para ler os clientes no ficheiro
 cliente* lerCliente(FILE* f) {
     cliente* new_cliente = (cliente*)malloc(sizeof(cliente));
-    fscanf(f, "%d %s %d %s %f %s %s\n", &(new_cliente->id), new_cliente->nome,
-        &(new_cliente->nif), new_cliente->morada, &(new_cliente->saldo), new_cliente->utilizador, new_cliente->password);
+    fscanf(f, "%d %s %d %s %s %f %s %s\n", &(new_cliente->id), new_cliente->nome,
+        &(new_cliente->nif), new_cliente->morada, new_cliente->local_grafo, &(new_cliente->saldo), 
+        new_cliente->utilizador, new_cliente->password);
     new_cliente->seguinte = NULL;
     return new_cliente;
 }
@@ -84,8 +90,9 @@ void lerClientes(FILE* f, cliente** head) {
     cliente* current = NULL;
     while (!feof(f)) {
         cliente* new_cliente = (cliente*)malloc(sizeof(cliente));
-        fscanf(f, "%d %s %d %s %f %s %s\n", &(new_cliente->id), new_cliente->nome,
-            &(new_cliente->nif), new_cliente->morada, &(new_cliente->saldo), new_cliente->utilizador, new_cliente->password);
+        fscanf(f, "%d %s %d %s %s %f %s %s\n", &(new_cliente->id), new_cliente->nome,
+            &(new_cliente->nif), new_cliente->morada, new_cliente->local_grafo, &(new_cliente->saldo), 
+            new_cliente->utilizador, new_cliente->password);
         new_cliente->seguinte = NULL;
         if (*head == NULL) {
             *head = new_cliente;
@@ -106,7 +113,7 @@ void atualizarCliente(FILE** f, cliente* head) {
 
     // Escreve os conteúdos de cada categoria
     while (curr != NULL) {
-        fprintf(*f, "%d %s %d %s %.2f %s %s\n", curr->id, curr->nome, curr->nif, curr->morada,
+        fprintf(*f, "%d %s %d %s %s %.2f %s %s\n", curr->id, curr->nome, curr->nif, curr->morada, curr->local_grafo,
             curr->saldo, curr->utilizador, curr->password);
         curr = curr->seguinte;
     }
@@ -188,9 +195,10 @@ void listarCliente() {
     // Mostra a lista de clientes
     printf("Lista de clientes:\n\n");
     cliente c;
-    while (fscanf(file, "%d %s %d %s %f %s %s\n", &c.id, c.nome, &c.nif, c.morada, &c.saldo, c.utilizador, c.password) != EOF) {
-        printf("ID: %d\nNome: %s\nNIF: %d\nMorada: %s\nSaldo: %.2f\nUtilizador: %s\nPassword: %s\n\n", c.id, c.nome, c.nif,
-            c.morada, c.saldo, c.utilizador, c.password);
+    while (fscanf(file, "%d %s %d %s %s %f %s %s\n", &c.id, c.nome, &c.nif, c.morada, c.local_grafo, &c.saldo, 
+        c.utilizador, c.password) != EOF) {
+        printf("ID: %d\nNome: %s\nNIF: %d\nMorada: %s\nGeocodigo: %s\nSaldo: %.2f\nUtilizador: %s\nPassword: %s\n\n", 
+            c.id, c.nome, c.nif, c.morada, c.local_grafo, c.saldo, c.utilizador, c.password);
     }
 
     fclose(file);
@@ -221,8 +229,9 @@ void removerCliente() {
     printf("Lista de clientes:\n\n");
     curr = head;
     while (curr != NULL) {
-        printf("ID: %d\nNome: %s\nNIF: %d\nMorada: %s\nSaldo: %.2f\nUtilizador: %s\nPassword: %s\n\n", curr->id, 
-            curr->nome, curr->nif, curr->morada, curr->saldo, curr->utilizador, curr->password);
+        printf("ID: %d\nNome: %s\nNIF: %d\nMorada: %s\nGeocodigo: %s\nSaldo: %.2f\nUtilizador: %s\nPassword: %s\n\n", 
+            curr->id, curr->nome, curr->nif, curr->morada, curr->local_grafo, curr->saldo, curr->utilizador, 
+            curr->password);
             curr = curr->seguinte;
     }
 
@@ -289,8 +298,9 @@ void alterarCliente() {
     printf("Lista de clientes:\n\n");
     curr = head;
     while (curr != NULL) {
-        printf("ID: %d\nNome: %s\nNIF: %d\nMorada: %s\nSaldo: %.2f\nUtilizador: %s\nPassword: %s\n\n", curr->id,
-            curr->nome, curr->nif, curr->morada, curr->saldo, curr->utilizador, curr->password);
+        printf("ID: %d\nNome: %s\nNIF: %d\nMorada: %s\nGeocodigo: %s\nSaldo: %.2f\nUtilizador: %s\nPassword: %s\n\n", 
+            curr->id, curr->nome, curr->nif, curr->morada, curr->local_grafo, curr->saldo, curr->utilizador, 
+            curr->password);
             curr = curr->seguinte;
     }
 
@@ -315,7 +325,7 @@ void alterarCliente() {
         // Alterar o cliente com o ID escolhido
         char campo[20], novo_valor[50];
         do {
-            printf("Digite o campo a alterar (nome, nif, morada, saldo, utilizador, password), ou 'fim' para terminar: ");
+            printf("Digite o campo a alterar (nome, nif, morada, geocodigo, saldo, utilizador, password), ou 'fim' para terminar: ");
             scanf("%s", campo);
             if (strcmp(campo, "fim") == 0) {
                 break;
@@ -330,6 +340,9 @@ void alterarCliente() {
             }
             else if (strcmp(campo, "morada") == 0) {
                 strcpy(curr->morada, novo_valor);
+            }
+            else if (strcmp(campo, "geocodigo") == 0) {
+                strcpy(curr->local_grafo, novo_valor);
             }
             else if (strcmp(campo, "saldo") == 0) {
                 curr->saldo = atof(novo_valor);
@@ -490,7 +503,7 @@ void listarMeioCliente(char order_by) {
     meio m[100];
     int count = 0;
     while (fscanf(file, "%d %s %f %f %s %s %d\n", &m[count].id, m[count].tipo, &m[count].custo, &m[count].bateria,
-        m[count].distancia, m[count].local, &m[count].reserva) != EOF) {
+        m[count].local, m[count].local_grafo, &m[count].reserva) != EOF) {
         if (m[count].reserva == 1) {
             continue; // saltar a adição do meio ao array caso reserva = 1
         }
@@ -510,21 +523,7 @@ void listarMeioCliente(char order_by) {
             }
         }
     }
-    else if (order_by == 'd') {
-        // Ordenar por distância
-        for (int i = 0; i < count - 1; i++) {
-            for (int j = 0; j < count - i - 1; j++) {
-                float dist1 = atof(m[j].distancia);
-                float dist2 = atof(m[j + 1].distancia);
-                if (dist1 > dist2) {
-                    meio temp = m[j];
-                    m[j] = m[j + 1];
-                    m[j + 1] = temp;
-                }
-            }
-        }
-    }
-
+    
     // Mostrar lista de meios
     int printed_count = 0;
     printf("Lista de meios:\n\n");
@@ -532,8 +531,8 @@ void listarMeioCliente(char order_by) {
         if (m[i].reserva == 1) {
             continue; // Saltar o meio
         }
-        printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nDistancia: %s\nLocal: %s\n\n", m[i].id, m[i].tipo,
-            m[i].custo, m[i].bateria, m[i].distancia, m[i].local);
+        printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nLocal: %s\n\n", m[i].id, m[i].tipo,
+            m[i].custo, m[i].bateria, m[i].local);
         printed_count++;
     }
     if (printed_count == 0) {
@@ -636,7 +635,7 @@ void terminarAluguer(int id_cliente) {
     }
 
     // Pedir ao utilizador o ID do registo a ser cancelado
-    printf("Insira o ID do aluguer que deseja cancelar: ");
+    printf("\nInsira o ID do aluguer que deseja cancelar: ");
     scanf("%d", &registo_id);
 
     // Percorrer a lista de registos para encontrar o registo a ser cancelado
@@ -814,11 +813,13 @@ void showMenuCliente(registo** headR) {
 
         switch (opcao) {
         case 1:
+            system("clear || cls");
             printf("\nALUGAR MEIO(S) TRANSPORTE(S)\n\n");
             registarAluguer(id_cliente, headR);
             break;
 
         case 2:
+            system("clear || cls");
             printf("\nCONSULTAR MEIO(S)\n\n");
             printf("\nComo deseja ordenar a lista de meios?\n\n");
             printf("B - Por bateria\n");
@@ -830,25 +831,30 @@ void showMenuCliente(registo** headR) {
             break;
 
         case 3:
+            system("clear || cls");
             printf("\nCONSULTAR ALUGUER(ES)\n\n");
             listarAluguerCliente(id_cliente);
             break;
 
         case 4:
+            system("clear || cls");
             printf("\nTERMINAR ALUGUER\n\n");
             terminarAluguer(id_cliente);
             break;
 
         case 5:
+            system("clear || cls");
             printf("\nCARREGAR SALDO\n\n");
             carregarSaldo(id_cliente);
             break;
 
         case 0:
+            system("clear || cls");
             printf("\nObrigado por utilizar o nosso sistema!\n");
             break;
 
         default:
+            system("clear || cls");
             printf("\nOpcao invalida! Tente novamente.\n");
             break;
         }

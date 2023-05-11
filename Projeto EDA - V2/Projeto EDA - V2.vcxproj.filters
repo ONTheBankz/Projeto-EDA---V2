@@ -33,6 +33,9 @@
     <ClCompile Include="func_aluguer.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="func_grafo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="structs.h">

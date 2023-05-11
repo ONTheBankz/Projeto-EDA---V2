@@ -5,7 +5,7 @@
 #include "structs.h"
 
 // Menu Login
-void showMenu(cliente** headC, gestor** headG, meio** headM, registo** headR) {
+void showMenu(cliente** headC, gestor** headG, meio** headM, registo** headR, grafo** g) {
     int opcao;
     do {
         printf("===================================\n");
@@ -44,7 +44,7 @@ void showMenu(cliente** headC, gestor** headG, meio** headM, registo** headR) {
             printf("\nLOGIN DO GESTOR\n\n");           
             loginGestor(headG, headM, headR);
             break;
-            
+        
         case 0:
             printf("\nObrigado por utilizar o nosso sistema!\n");
             getchar();

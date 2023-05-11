@@ -398,8 +398,9 @@ void registarAluguerGestor(registo** headR) {
     curr_meio = head_meio;
     while (curr_meio != NULL) {
         if (curr_meio->reserva != 1) {
-            printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nDistancia: %s\nLocal: %s\n\n", curr_meio->id,
-                curr_meio->tipo, curr_meio->custo, curr_meio->bateria, curr_meio->distancia, curr_meio->local);
+            printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nLocal: %s\nGeocodigo: %s\nReserva: %d\n\n", 
+                curr_meio->id, curr_meio->tipo, curr_meio->custo, curr_meio->bateria,
+                curr_meio->local, curr_meio->local_grafo, curr_meio->reserva);
         }
         curr_meio = curr_meio->seguinte;
     }
@@ -413,8 +414,9 @@ void registarAluguerGestor(registo** headR) {
         printf("Lista de clientes:\n\n");
         curr = head;
         while (curr != NULL) {
-            printf("ID: %d\nNome: %s\nNIF: %d\nMorada: %s\nSaldo: %.2f\nUtilizador: %s\nPassword: %s\n\n", curr->id,
-                    curr->nome, curr->nif, curr->morada, curr->saldo, curr->utilizador, curr->password);
+            printf("ID: %d\nNome: %s\nNIF: %d\nMorada: %s\nGeocodigo: %s\nSaldo: %.2f\nUtilizador: %s\nPassword: %s\n\n", 
+                curr->id, curr->nome, curr->nif, curr->morada, curr->local_grafo, curr->saldo, curr->utilizador, 
+                curr->password);
                     curr = curr->seguinte;
         }
 
@@ -740,10 +742,12 @@ void showMenuGestor(meio** headM, registo** headR) {
             break;
 
         case 0:
+            system("clear || cls");
             printf("\nObrigado por utilizar o nosso sistema!\n");
             break;
 
         default:
+            system("clear || cls");
             printf("\nOpcao invalida! Tente novamente.\n");
             break;
         }
