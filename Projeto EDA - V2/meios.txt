@@ -2,3 +2,5 @@
 2 Skate 0.30 40.00 Braga incineradora.cabine.cantor 0
 3 Troti 0.20 20.00 Braga cigana.pardal.organizativo 0
 4 Trotinete 0.30 50.00 Braga jardim.st.barb 0
+5 a 1.00 1.00 a rua.da.praia 0
+6 a 1.00 1.00 a rua.das.flores 0

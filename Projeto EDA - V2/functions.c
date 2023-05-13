@@ -5,7 +5,7 @@
 #include "structs.h"
 
 // Menu Login
-void showMenu(cliente** headC, gestor** headG, meio** headM, registo** headR, grafo** g) {
+void showMenu(cliente** headC, gestor** headG, meio** headM, registo** headR) {
     int opcao;
     do {
         printf("===================================\n");

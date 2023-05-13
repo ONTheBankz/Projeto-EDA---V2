@@ -1,7 +1,4 @@
-1 David 217725732 Braga rua.das.flores 20.00 david abc
-2 Diogo 273065862 Tirso rua.dos.refojos 15.00 diogo abc
-3 Marcelo 24786313 Taipas rua.da.feira 30.00 lxst abc
-4 a 1 a a 1.00 a a
-5 b 2 b b 2.00 b b
-6 a 1 a ¿ˆÅfr 1.00 a a
-7 a 1 a  Û˚ 1.00 a a
+1 David 217725732 Braga 20.00 david abc
+2 Diogo 273065862 Tirso 15.00 diogo abc
+3 Marcelo 24786313 Taipas 30.00 lxst abc
+4 Nuno 127418271 Guima 10.00 nuno abc

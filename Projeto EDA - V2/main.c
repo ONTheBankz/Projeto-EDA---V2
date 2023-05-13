@@ -18,17 +18,16 @@ int main() {
         // Se o arquivo existir, carrega o grafo a partir do arquivo e exibe o menu
         fclose(fp);
         grafo* g = carregarGrafo("grafo.txt");
-        showMenu(&headC, &headG, &headM, &headR, &g);
+        showMenu(&headC, &headG, &headM, &headR);
     }
     else {
         // Se o arquivo não existir, cria um novo grafo, salva-o no arquivo e exibe o menu
         grafo* g = criarGrafo();
         salvarGrafo(g, "grafo.txt");
-        showMenu(&headC, &headG, &headM, &headR, &g);
+        showMenu(&headC, &headG, &headM, &headR);
         // Libera a memória alocada para o grafo após o uso.
         free(g->vertices);
         free(g);
     }
-    // Retorna 0 ao finalizar.
     return 0;
 }

@@ -6,6 +6,9 @@
 
 // Função para registar um meio
 void registarMeio(meio** head) {
+    grafo* lista_vertices = NULL;
+    grafo* g = carregarGrafo("grafo.txt");
+    lista_vertices = criarListaVertices(g);
     // Alocar memória para um novo meio
     meio* novo_meio = (meio*)malloc(sizeof(meio));
 
@@ -16,6 +19,7 @@ void registarMeio(meio** head) {
         return;
     }
     int id = 0;
+    int id_vert;
     int reserva;
     char tipo[50], distancia[50], local[50], local_grafo[50];
     float custo, bateria;
@@ -44,8 +48,20 @@ void registarMeio(meio** head) {
     printf("Digite o local do meio: ");
     scanf("%s", novo_meio->local);
 
-    printf("Digite o local do meio (geocodigo): ");
-    scanf("%s", novo_meio->local_grafo);
+    // Print the list of vertices and ask for input
+    printVertice(lista_vertices);
+    printf("\nDigite o ID correspondente ao vertice escolhido: ");
+    scanf("%d", &id_vert);
+
+    // Encontra o vértice com o ID escolhido e copia o respetivo nome
+    vertice_node* current = lista_vertices;
+    while (current != NULL) {
+        if (current->id == id_vert) {
+            strcpy(novo_meio->local_grafo, current->nome);
+            break;
+        }
+        current = current->proximo;
+    }
 
     // Colocar o próximo pointer no topo da lista
     novo_meio->seguinte = *head;

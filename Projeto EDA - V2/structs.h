@@ -6,7 +6,6 @@ typedef struct cliente {
     char utilizador[50];
     char password[50];
     char morada[50];
-    char local_grafo[50];
     float saldo;
     struct cliente* seguinte;
 } cliente;
@@ -58,6 +57,12 @@ typedef struct vertice {
     struct vertice* seguinte;
 } vertice;
 
+typedef struct vertice_node {
+    int id;
+    char nome[100];
+    struct vertice_node* proximo;
+} vertice_node;
+
 typedef struct grafo {
     int num_vertices;
     int num_arestas;
@@ -86,7 +91,7 @@ gestor* lerGestor(FILE* f);
 void lerGestores(FILE* f, gestor** head);
 void atualizarGestor(FILE** f, gestor* head);
 void atualizarBinGestor(FILE** f, gestor* head);
-void loginGestor(gestor** head, meio** headM);
+void loginGestor(gestor** head, meio** headM, registo** headR);
 void listarGestor();
 void removerGestor();
 void alterarGestor();
@@ -105,8 +110,10 @@ void alterarMeio();
 // FUNÇÕES GRAFO
 grafo* criarGrafo();
 grafo* carregarGrafo(const char* nome_arquivo);
+vertice_node* criarListaVertices(grafo* g);
 void conectarVertices(grafo* g, int id_origem, int id_destino, int peso, float distancia);
 void salvarGrafo(const grafo* g, const char* nome_arquivo);
+void printVertice(vertice_node* head);
 
 // FUNÇÕES ALUGUER
 void registarAluguer(int id_cliente, registo** head);

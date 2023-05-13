@@ -31,7 +31,7 @@ void registarCliente(cliente** head) {
     float saldo;
 
     // Encontrar o último ID presente no ficheiro e incrementá-lo
-    while (fscanf(f_txt, "%d %s %d %s %s %f %s %s\n", &id, nome, &nif, morada, local_grafo, &saldo,
+    while (fscanf(f_txt, "%d %s %d %s %f %s %s\n", &id, nome, &nif, morada, &saldo,
         utilizador, password) != EOF) {
     }
     id++; // Incrementar o último ID encontrado
@@ -45,8 +45,6 @@ void registarCliente(cliente** head) {
     scanf("%d", &(new_cliente->nif));
     printf("Morada: ");
     scanf("%s", new_cliente->morada);
-    printf("Geocodigo: ");
-    scanf("%s", new_cliente->local_grafo);
     printf("Saldo: ");
     scanf("%f", &(new_cliente->saldo));
     printf("Utilizador: ");
@@ -60,8 +58,8 @@ void registarCliente(cliente** head) {
 
     // Escrever os valores do cliente no ficheiro de texto
         f_txt = fopen("clientes.txt", "a");
-    fprintf(f_txt, "%d %s %d %s %s %.2f %s %s\n", new_cliente->id, new_cliente->nome, new_cliente->nif,
-        new_cliente->morada, new_cliente->local_grafo, new_cliente->saldo, new_cliente->utilizador,
+    fprintf(f_txt, "%d %s %d %s %.2f %s %s\n", new_cliente->id, new_cliente->nome, new_cliente->nif,
+        new_cliente->morada, new_cliente->saldo, new_cliente->utilizador,
         new_cliente->password);
     fclose(f_txt);
 
@@ -78,8 +76,8 @@ void registarCliente(cliente** head) {
 // Função para ler os clientes no ficheiro
 cliente* lerCliente(FILE* f) {
     cliente* new_cliente = (cliente*)malloc(sizeof(cliente));
-    fscanf(f, "%d %s %d %s %s %f %s %s\n", &(new_cliente->id), new_cliente->nome,
-        &(new_cliente->nif), new_cliente->morada, new_cliente->local_grafo, &(new_cliente->saldo), 
+    fscanf(f, "%d %s %d %s %f %s %s\n", &(new_cliente->id), new_cliente->nome,
+        &(new_cliente->nif), new_cliente->morada, &(new_cliente->saldo), 
         new_cliente->utilizador, new_cliente->password);
     new_cliente->seguinte = NULL;
     return new_cliente;
@@ -90,8 +88,8 @@ void lerClientes(FILE* f, cliente** head) {
     cliente* current = NULL;
     while (!feof(f)) {
         cliente* new_cliente = (cliente*)malloc(sizeof(cliente));
-        fscanf(f, "%d %s %d %s %s %f %s %s\n", &(new_cliente->id), new_cliente->nome,
-            &(new_cliente->nif), new_cliente->morada, new_cliente->local_grafo, &(new_cliente->saldo), 
+        fscanf(f, "%d %s %d %s %f %s %s\n", &(new_cliente->id), new_cliente->nome,
+            &(new_cliente->nif), new_cliente->morada, &(new_cliente->saldo), 
             new_cliente->utilizador, new_cliente->password);
         new_cliente->seguinte = NULL;
         if (*head == NULL) {
@@ -113,7 +111,7 @@ void atualizarCliente(FILE** f, cliente* head) {
 
     // Escreve os conteúdos de cada categoria
     while (curr != NULL) {
-        fprintf(*f, "%d %s %d %s %s %.2f %s %s\n", curr->id, curr->nome, curr->nif, curr->morada, curr->local_grafo,
+        fprintf(*f, "%d %s %d %s %.2f %s %s\n", curr->id, curr->nome, curr->nif, curr->morada,
             curr->saldo, curr->utilizador, curr->password);
         curr = curr->seguinte;
     }
@@ -195,10 +193,10 @@ void listarCliente() {
     // Mostra a lista de clientes
     printf("Lista de clientes:\n\n");
     cliente c;
-    while (fscanf(file, "%d %s %d %s %s %f %s %s\n", &c.id, c.nome, &c.nif, c.morada, c.local_grafo, &c.saldo, 
+    while (fscanf(file, "%d %s %d %s %f %s %s\n", &c.id, c.nome, &c.nif, c.morada, &c.saldo, 
         c.utilizador, c.password) != EOF) {
-        printf("ID: %d\nNome: %s\nNIF: %d\nMorada: %s\nGeocodigo: %s\nSaldo: %.2f\nUtilizador: %s\nPassword: %s\n\n", 
-            c.id, c.nome, c.nif, c.morada, c.local_grafo, c.saldo, c.utilizador, c.password);
+        printf("ID: %d\nNome: %s\nNIF: %d\nMorada: %s\nSaldo: %.2f\nUtilizador: %s\nPassword: %s\n\n", 
+            c.id, c.nome, c.nif, c.morada, c.saldo, c.utilizador, c.password);
     }
 
     fclose(file);
@@ -229,8 +227,8 @@ void removerCliente() {
     printf("Lista de clientes:\n\n");
     curr = head;
     while (curr != NULL) {
-        printf("ID: %d\nNome: %s\nNIF: %d\nMorada: %s\nGeocodigo: %s\nSaldo: %.2f\nUtilizador: %s\nPassword: %s\n\n", 
-            curr->id, curr->nome, curr->nif, curr->morada, curr->local_grafo, curr->saldo, curr->utilizador, 
+        printf("ID: %d\nNome: %s\nNIF: %d\nMorada: %s\nSaldo: %.2f\nUtilizador: %s\nPassword: %s\n\n", 
+            curr->id, curr->nome, curr->nif, curr->morada, curr->saldo, curr->utilizador, 
             curr->password);
             curr = curr->seguinte;
     }
@@ -298,8 +296,8 @@ void alterarCliente() {
     printf("Lista de clientes:\n\n");
     curr = head;
     while (curr != NULL) {
-        printf("ID: %d\nNome: %s\nNIF: %d\nMorada: %s\nGeocodigo: %s\nSaldo: %.2f\nUtilizador: %s\nPassword: %s\n\n", 
-            curr->id, curr->nome, curr->nif, curr->morada, curr->local_grafo, curr->saldo, curr->utilizador, 
+        printf("ID: %d\nNome: %s\nNIF: %d\nMorada: %s\nSaldo: %.2f\nUtilizador: %s\nPassword: %s\n\n", 
+            curr->id, curr->nome, curr->nif, curr->morada, curr->saldo, curr->utilizador, 
             curr->password);
             curr = curr->seguinte;
     }
@@ -325,7 +323,7 @@ void alterarCliente() {
         // Alterar o cliente com o ID escolhido
         char campo[20], novo_valor[50];
         do {
-            printf("Digite o campo a alterar (nome, nif, morada, geocodigo, saldo, utilizador, password), ou 'fim' para terminar: ");
+            printf("Digite o campo a alterar (nome, nif, morada, saldo, utilizador, password), ou 'fim' para terminar: ");
             scanf("%s", campo);
             if (strcmp(campo, "fim") == 0) {
                 break;
@@ -340,9 +338,6 @@ void alterarCliente() {
             }
             else if (strcmp(campo, "morada") == 0) {
                 strcpy(curr->morada, novo_valor);
-            }
-            else if (strcmp(campo, "geocodigo") == 0) {
-                strcpy(curr->local_grafo, novo_valor);
             }
             else if (strcmp(campo, "saldo") == 0) {
                 curr->saldo = atof(novo_valor);
@@ -821,7 +816,7 @@ void showMenuCliente(registo** headR) {
         case 2:
             system("clear || cls");
             printf("\nCONSULTAR MEIO(S)\n\n");
-            printf("\nComo deseja ordenar a lista de meios?\n\n");
+            printf("Como deseja ordenar a lista de meios?\n\n");
             printf("B - Por bateria\n");
             printf("D - Por distancia\n\n");
             printf("Opcao: ");

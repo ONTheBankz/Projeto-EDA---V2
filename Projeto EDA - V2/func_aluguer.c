@@ -7,7 +7,8 @@
 
 // Função para alugar um meio
 void registarAluguer(int id_cliente, registo** headR) {
-    FILE* txt_meios, * bin_meios, * txt_clientes, * bin_clientes, * txt_registos, * bin_registos, * txt_historico, * bin_historico;
+    FILE* txt_meios, * bin_meios, * txt_clientes, * bin_clientes, * txt_registos, 
+        * bin_registos, * txt_historico, * bin_historico;
     registo r;
     cliente c;
     meio m;
@@ -116,16 +117,14 @@ void registarAluguer(int id_cliente, registo** headR) {
     // Alocar memória para um novo registo
     registo* new_registo = (registo*)malloc(sizeof(registo));
 
-    // Abrir o ficheiro de registos para leitura em modo append
-        txt_registos = fopen("registos.txt", "a+");
-    if (txt_registos == NULL) {
-        printf("Erro ao abrir o ficheiro registos.txt\n");
-        return;
-    }
-        bin_registos = fopen("registos.bin", "ab");
-    if (bin_registos == NULL) {
-        printf("Erro ao abrir o ficheiro registos.bin\n");
-        return;
+    // Abrir ficheiros em modo de escrita e leitura
+    txt_registos = fopen("registos.txt", "r");
+    bin_registos = fopen("registos.bin", "ab+");
+    if (txt_registos == NULL || bin_registos == NULL) {
+        system("clear || cls");
+        printf("Erro ao abrir arquivo!\n");
+        getchar();
+        exit(1);
     }
 
     // Encontrar o último ID presente no ficheiro e incrementá-lo
@@ -134,18 +133,18 @@ void registarAluguer(int id_cliente, registo** headR) {
         printf("Erro ao abrir o ficheiro registos.txt\n");
         return;
     }
-    if (fscanf(txt_registos, "%d %d %d %d/%d/%d %d:%d\n", &id_registo, &clientes, &meios, &dia_temp, &mes_temp, 
-        &ano_temp, &hora_temp, &min_temp) == EOF) {
+    if (fscanf(txt_registos, "%d %*d %*d %*d/%*d/%*d %*d:%*d\n", &id_registo) == EOF) {
         // Ficheiro está vazio, id registo fica a 1
-            id_registo = 1;
+        id_registo = 1;
     }
     else {
-        // Ficheiro não está vazio, incrementa ao valor anterior
-        while (fscanf(txt_registos, "%d %d %d %d/%d/%d %d:%d\n", &id_registo, &clientes, &meios, &dia_temp, &mes_temp, 
-            &ano_temp, &hora_temp, &min_temp) != EOF) {
-        }
             id_registo++;
+        // Ficheiro não está vazio, incrementa ao valor anterior
+        while (fscanf(txt_registos, "%*d %*d %*d %*d/%*d/%*d %*d:%*d\n") != EOF) {
+            id_registo++;
+        }
     }
+
     fclose(txt_registos); // Fechar o ficheiro
 
     // Preencher os campos do novo registo
@@ -164,30 +163,29 @@ void registarAluguer(int id_cliente, registo** headR) {
 
     // Escrever os valores do registo no ficheiro de texto
     txt_registos = fopen("registos.txt", "a");
-    fprintf(txt_registos, "%d %d %d %d/%d/%d %d:%d\n", new_registo->id, new_registo->cliente_id, new_registo->meio_id,
-        new_registo->dia, new_registo->mes, new_registo->ano, new_registo->horas, new_registo->minutos);
+    fprintf(txt_registos, "%d %d %d %d/%d/%d %d:%d\n", new_registo->id, new_registo->cliente_id, 
+        new_registo->meio_id, new_registo->dia, new_registo->mes, new_registo->ano, new_registo->horas, 
+        new_registo->minutos);
     fclose(txt_registos);
 
     // Escrever os valores do registo no ficheiro binário
     fwrite(new_registo, sizeof(registo), 1, bin_registos);
     fclose(bin_registos);
 
-    // Abrir o ficheiro de histórico para escrita em modo append
-        txt_historico = fopen("historico.txt", "a");
-    if (txt_historico == NULL) {
-        printf("Erro ao abrir o ficheiro historico.txt\n");
-        return;
-    }
-
-        bin_historico = fopen("historico.bin", "ab");
-    if (bin_historico == NULL) {
-        printf("Erro ao abrir o ficheiro historico.bin\n");
-        return;
+    // Abrir ficheiros em modo de escrita e leitura
+    txt_historico = fopen("historico.txt", "r");
+    bin_historico = fopen("historico.bin", "ab+");
+    if (txt_historico == NULL || bin_historico == NULL) {
+        system("clear || cls");
+        printf("Erro ao abrir arquivo!\n");
+        getchar();
+        exit(1);
     }
 
     // Escrever os valores do registo no ficheiro de texto
-    fprintf(txt_historico, "%d %d %d %d/%d/%d %d:%d\n", new_registo->id, new_registo->cliente_id, new_registo->meio_id,
-        new_registo->dia, new_registo->mes, new_registo->ano, new_registo->horas, new_registo->minutos);
+    fprintf(txt_historico, "%d %d %d %d/%d/%d %d:%d\n", new_registo->id, new_registo->cliente_id, 
+        new_registo->meio_id, new_registo->dia, new_registo->mes, new_registo->ano, new_registo->horas, 
+        new_registo->minutos);
     fclose(txt_historico);
 
     // Escrever os valores do registo no ficheiro binário

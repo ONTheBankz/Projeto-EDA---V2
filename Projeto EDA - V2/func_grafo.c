@@ -43,6 +43,67 @@ grafo* criarGrafo() {
     return g;
 }
 
+grafo* carregarGrafo(const char* nome_arquivo) {
+    FILE* fp = fopen(nome_arquivo, "r");
+    if (fp == NULL) {
+        printf("Erro ao abrir o arquivo %s para leitura.\n", nome_arquivo);
+        return NULL;
+    }
+
+    // Lê o número de vértices e arestas
+    int num_vertices, num_arestas;
+    fscanf(fp, "%d %d", &num_vertices, &num_arestas);
+
+    // Aloca memória para o grafo e os vértices
+    grafo* g = (grafo*)malloc(sizeof(grafo));
+    g->num_vertices = num_vertices;
+    g->num_arestas = 0;
+    g->vertices = (vertice*)malloc(num_vertices * sizeof(vertice));
+
+    // Lê os vértices
+    for (int i = 0; i < num_vertices; i++) {
+        int id;
+        char nome[100];
+        fscanf(fp, "%d %s", &id, nome);
+        strcpy(g->vertices[i].nome, nome);
+        g->vertices[i].id = id;
+        g->vertices[i].meios = NULL;
+        g->vertices[i].arestas = NULL;
+        g->vertices[i].seguinte = NULL;
+    }
+
+    // Lê as arestas
+    for (int i = 0; i < num_vertices; i++) {
+        int id_origem, id_destino, peso;
+        float distancia;
+        while (fscanf(fp, "%d:%d %d %f", &id_origem, &id_destino, &peso, &distancia) == 4) {
+            conectarVertices(g, id_origem, id_destino, peso, distancia);
+        }
+    }
+
+    fclose(fp);
+    return g;
+}
+
+vertice_node* criarListaVertices(grafo* g) {
+    vertice_node* head = NULL;
+    vertice_node* current = NULL;
+    for (int i = 0; i < g->num_vertices; i++) {
+        vertice_node* node = (vertice_node*)malloc(sizeof(vertice_node));
+        node->id = g->vertices[i].id;
+        strcpy(node->nome, g->vertices[i].nome);
+        node->proximo = NULL;
+        if (current == NULL) {
+            head = node;
+        }
+        else {
+            current->proximo = node;
+        }
+        current = node;
+    }
+    return head;
+}
+
 void conectarVertices(grafo* g, int id_origem, int id_destino, int peso, float distancia) {
     // Cria uma nova aresta
     aresta* nova_aresta = (aresta*)malloc(sizeof(aresta));
@@ -96,47 +157,19 @@ void salvarGrafo(const grafo* g, const char* nome_arquivo) {
     fclose(fp);
 }
 
-grafo* carregarGrafo(const char* nome_arquivo) {
-    FILE* fp = fopen(nome_arquivo, "r");
-    if (fp == NULL) {
-        printf("Erro ao abrir o arquivo %s para leitura.\n", nome_arquivo);
-        return NULL;
+void printVertice(vertice_node* head) {
+    vertice_node* current = head;
+    printf("\nVertices:\n\n");
+    while (current != NULL) {
+        printf("ID: %d, Nome: %s\n", current->id, current->nome);
+        current = current->proximo;
     }
-
-    // Lê o número de vértices e arestas
-    int num_vertices, num_arestas;
-    fscanf(fp, "%d %d", &num_vertices, &num_arestas);
-
-    // Aloca memória para o grafo e os vértices
-    grafo* g = (grafo*)malloc(sizeof(grafo));
-    g->num_vertices = num_vertices;
-    g->num_arestas = 0;
-    g->vertices = (vertice*)malloc(num_vertices * sizeof(vertice));
-
-    // Lê os vértices
-    for (int i = 0; i < num_vertices; i++) {
-        int id;
-        char nome[100];
-        fscanf(fp, "%d %s", &id, nome);
-        strcpy(g->vertices[i].nome, nome);
-        g->vertices[i].id = id;
-        g->vertices[i].meios = NULL;
-        g->vertices[i].arestas = NULL;
-        g->vertices[i].seguinte = NULL;
-    }
-
-    // Lê as arestas
-    for (int i = 0; i < num_vertices; i++) {
-        int id_origem, id_destino, peso;
-        float distancia;
-        while (fscanf(fp, "%d:%d %d %f", &id_origem, &id_destino, &peso, &distancia) == 4) {
-            conectarVertices(g, id_origem, id_destino, peso, distancia);
-        }
-    }
-
-    fclose(fp);
-    return g;
 }
+
+
+
+
+
 
 
 
