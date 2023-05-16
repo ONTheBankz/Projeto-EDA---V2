@@ -118,7 +118,7 @@ void atualizarBinGestor(FILE** f, gestor* head) {
 }
 
 // Função para fazer login (Gestor)
-void loginGestor(gestor** head, meio** headM, registo** headR) {
+void loginGestor(gestor** head, meio** headM, registo** headR, grafo** headV) {
     char username[50];
     char password[50];
 
@@ -141,7 +141,7 @@ void loginGestor(gestor** head, meio** headM, registo** headR) {
             system("clear || cls");
             printf("Bem-vindo, %s!\n", curr->nome);
             getchar();
-            showMenuGestor(headM, headR);
+            showMenuGestor(headM, headR, headV);
             if (prev != NULL) {
                 prev->seguinte = curr->seguinte;
                 curr->seguinte = *head;
@@ -613,7 +613,7 @@ void carregarSaldoGestor() {
 }
 
 // Menu Gestor
-void showMenuGestor(meio** headM, registo** headR) {
+void showMenuGestor(meio** headM, registo** headR, grafo** headV) {
     int opcao;
     char order_by;
     do {
@@ -639,9 +639,16 @@ void showMenuGestor(meio** headM, registo** headR) {
         printf("11 - Alterar dados meio\n\n");
         printf("ALUGUERES\n\n");
         printf("Escolha uma opcao:\n");
-        printf("12 - Registar novo aluguer\n");
-        printf("13 - Listar registos aluguer\n");
+        printf("12 - Registar aluguer\n");
+        printf("13 - Listar aluguer\n");
         printf("14 - Cancelar Aluguer\n\n");
+        printf("LOCALIZACOES\n\n");
+        printf("Escolha uma opcao:\n");
+        printf("15 - Registar localizacao\n");
+        printf("16 - Editar localizacao\n");
+        printf("17 - Remover localizacao\n");
+        printf("18 - Registar conexao (locais)\n");
+        printf("19 - Remover conexao (locais)\n");
         printf("OUTROS\n\n");
         printf("Escolha uma opcao:\n");
         printf("0 - Sair\n");
@@ -694,7 +701,7 @@ void showMenuGestor(meio** headM, registo** headR) {
         case 8:
             system("clear || cls");
             printf("\nREGISTAR MEIO\n\n");
-            registarMeio(headM);
+            registarMeio(headM, headV);
             break;
 
         case 9:
@@ -706,7 +713,7 @@ void showMenuGestor(meio** headM, registo** headR) {
             printf("Opcao: ");
             scanf(" %c", &order_by);
             printf("\n\n");
-            listarMeio(order_by);
+            listarMeio(order_by, headV);
             break;
  
         case 10:
@@ -737,6 +744,37 @@ void showMenuGestor(meio** headM, registo** headR) {
             system("clear || cls");
             printf("\CANCELAR ALUGUER\n\n");
             cancelarAluguer();
+            break;
+
+        case 15:
+            system("clear || cls");
+            printf("\nREGISTAR LOCALIZACAO\n\n");
+            // Adiciona o novo vértice e conecta ás arestas
+            criarVertice(headV);
+            break;
+
+        case 16:
+            system("clear || cls");
+            printf("\nEDITAR LOCALIZACAO\n\n");
+            editarVertice(headV);
+            break;
+
+        case 17:
+            system("clear || cls");
+            printf("\REMOVER LOCALIZACAO\n\n");
+            removerVertice(headV);
+            break;
+
+        case 18:
+            system("clear || cls");
+            printf("\REGISTAR CONEXAO (LOCAIS)\n\n");
+            criarAresta(headV);
+            break;
+
+        case 19:
+            system("clear || cls");
+            printf("\REMOVER CONEXAO (LOCAIS)\n\n");
+      
             break;
 
         case 0:

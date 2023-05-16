@@ -45,7 +45,6 @@ typedef struct aresta {
     int id_origem;      // id do vértice de origem
     int id_destino;     // id do vértice de destino
     int peso;
-    float distancia;    // distância entre os vértices
     struct aresta* proxima;
 } aresta;
 
@@ -53,22 +52,15 @@ typedef struct vertice {
     int id;
     char nome[50];
     meio* meios;
-    aresta* arestas;    // arestas adjacentes
+    aresta* arestas; 
     struct vertice* seguinte;
 } vertice;
-
-typedef struct vertice_node {
-    int id;
-    char nome[100];
-    struct vertice_node* proximo;
-} vertice_node;
 
 typedef struct grafo {
     int num_vertices;
     int num_arestas;
     vertice* vertices;
 } grafo;
-
 
 // FUNÇÕES CLIENTE
 void registarCliente(cliente** head);
@@ -91,7 +83,7 @@ gestor* lerGestor(FILE* f);
 void lerGestores(FILE* f, gestor** head);
 void atualizarGestor(FILE** f, gestor* head);
 void atualizarBinGestor(FILE** f, gestor* head);
-void loginGestor(gestor** head, meio** headM, registo** headR);
+void loginGestor(gestor** head, meio** headM, registo** headR, grafo** headV);
 void listarGestor();
 void removerGestor();
 void alterarGestor();
@@ -99,8 +91,8 @@ void carregarSaldoGestor();
 void registarAluguerGestor(registo** headR);
 
 // FUNÇÕES MEIO
-void registarMeio(meio** head);
-void listarMeio(char order_by);
+void registarMeio(meio** head, grafo** g);
+void listarMeio(char order_by, grafo** g);
 void lerMeios(FILE* f, meio** head);
 void atualizarMeio(FILE** f, meio* head_meio);
 void atualizarBinMeio(FILE** f, meio* head_meio);
@@ -109,11 +101,14 @@ void alterarMeio();
 
 // FUNÇÕES GRAFO
 grafo* criarGrafo();
-grafo* carregarGrafo(const char* nome_arquivo);
-vertice_node* criarListaVertices(grafo* g);
-void conectarVertices(grafo* g, int id_origem, int id_destino, int peso, float distancia);
-void salvarGrafo(const grafo* g, const char* nome_arquivo);
-void printVertice(vertice_node* head);
+grafo* carregarGrafo();
+vertice* buscarVertice(grafo* g, int id);
+void salvarGrafo(grafo* g);
+void criarVertice(grafo* g);
+void editarVertice(grafo* g);
+void removerVertice(grafo* g);
+void imprimirVertices(grafo* g);
+void criarAresta(grafo* g);
 
 // FUNÇÕES ALUGUER
 void registarAluguer(int id_cliente, registo** head);
@@ -124,6 +119,6 @@ void listarAluguer();
 void cancelarAluguer();
 
 // FUNÇÕES MENU
-void showMenu(cliente** headC, gestor** headG, meio** headM, registo** headR);
-void showMenuGestor(meio** headM, registo** headR);
+void showMenu(cliente** headC, gestor** headG, meio** headM, registo** headR, grafo** headV);
+void showMenuGestor(meio** headM, registo** headR, grafo** headV);
 void showMenuCliente(registo** headR);

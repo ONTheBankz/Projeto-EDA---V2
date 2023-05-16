@@ -797,8 +797,8 @@ void showMenuCliente(registo** headR) {
         printf("Escolha uma opcao:\n");
         printf("1 - Alugar meios transporte\n");
         printf("2 - Consultar meios diponiveis\n");
-        printf("3 - Consultar aluguer(es)\n");
-        printf("4 - Terminar aluguer(es)\n");
+        printf("3 - Consultar alugueres\n");
+        printf("4 - Terminar alugueres\n");
         printf("5 - Carregar Saldo\n\n");
         printf("OUTROS\n\n");
         printf("Escolha uma opcao:\n");

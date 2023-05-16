@@ -5,10 +5,8 @@
 #include "structs.h"
 
 // Função para registar um meio
-void registarMeio(meio** head) {
-    grafo* lista_vertices = NULL;
-    grafo* g = carregarGrafo("grafo.txt");
-    lista_vertices = criarListaVertices(g);
+void registarMeio(meio** head, grafo** g) {
+    *g = carregarGrafo();
     // Alocar memória para um novo meio
     meio* novo_meio = (meio*)malloc(sizeof(meio));
 
@@ -18,6 +16,7 @@ void registarMeio(meio** head) {
         printf("Erro ao abrir o ficheiro meios.txt\n");
         return;
     }
+
     int id = 0;
     int id_vert;
     int reserva;
@@ -25,7 +24,7 @@ void registarMeio(meio** head) {
     float custo, bateria;
 
     // Encontrar o último ID presente no ficheiro e incrementá-lo
-    while (fscanf(f, "%d %s %f %f %s %s %d\n", &id, tipo, &custo, &bateria, local, 
+    while (fscanf(f, "%d %s %f %f %s %s %d\n", &id, tipo, &custo, &bateria, local,
         local_grafo, &reserva) != EOF) {
 
     }
@@ -48,19 +47,22 @@ void registarMeio(meio** head) {
     printf("Digite o local do meio: ");
     scanf("%s", novo_meio->local);
 
-    // Print the list of vertices and ask for input
-    printVertice(lista_vertices);
-    printf("\nDigite o ID correspondente ao vertice escolhido: ");
+    printf("\nLocalizacoes:\n\n");
+    // Mostra a lista de vértices e pede ao usuário o ID
+    vertice* v = (*g)->vertices;
+    imprimirVertices(*g);
+
+    printf("\nDigite o ID correspondente a localizacao do meio: ");
     scanf("%d", &id_vert);
 
     // Encontra o vértice com o ID escolhido e copia o respetivo nome
-    vertice_node* current = lista_vertices;
-    while (current != NULL) {
-        if (current->id == id_vert) {
-            strcpy(novo_meio->local_grafo, current->nome);
+    v = (*g)->vertices;
+    while (v != NULL) {
+        if (v->id == id_vert) {
+            strcpy(novo_meio->local_grafo, v->nome);
             break;
         }
-        current = current->proximo;
+        v = v->seguinte;
     }
 
     // Colocar o próximo pointer no topo da lista
@@ -149,23 +151,24 @@ void atualizarBinMeio(FILE** f, meio* head_meio) {
 }
 
 // Função para listar um meio
-void listarMeio(char order_by) {
-    // Abrir ficheiro em modo leitura
-    FILE* txt_meio = fopen("meios.txt", "r");
-    if (txt_meio == NULL) {
-        printf("Erro ao abrir arquivo!\n");
-        exit(1);
-    }
-    // Criar array de meios
-    meio m[100];
-    int count = 0;
-    while (fscanf(txt_meio, "%d %s %f %f %s %s %d\n", &m[count].id, m[count].tipo, &m[count].custo, &m[count].bateria,
-        m[count].local, m[count].local_grafo, &m[count].reserva) != EOF) {
-        count++;
-    }
-
-    // Lista de ordenação
+void listarMeio(char order_by, grafo** g) {
+    g = carregarGrafo("grafo.txt");
     if (order_by == 'b') {
+        // Abre o ficheiro com os meios
+        FILE* txt_meio = fopen("meios.txt", "r");
+        if (txt_meio == NULL) {
+            printf("Erro ao abrir arquivo!\n");
+            exit(1);
+        }
+
+        // Cria um array com os meios
+        meio m[100];
+        int count = 0;
+        while (fscanf(txt_meio, "%d %s %f %f %s %s %d\n", &m[count].id, m[count].tipo, &m[count].custo, 
+            &m[count].bateria, m[count].local, m[count].local_grafo, &m[count].reserva) != EOF) {
+            count++;
+        }
+
         // Ordenar por bateria
         for (int i = 0; i < count - 1; i++) {
             for (int j = 0; j < count - i - 1; j++) {
@@ -176,17 +179,22 @@ void listarMeio(char order_by) {
                 }
             }
         }
-    }
-    
-    // Mostrar lista de meios
-    printf("Lista de meios:\n\n");
-    for (int i = 0; i < count; i++) {
-        printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nLocal: %s\nGeocodigo: %s\nReserva: %d\n\n", 
-            m[i].id, m[i].tipo, m[i].custo, m[i].bateria, m[i].local, m[i].local_grafo, m[i].reserva);
+
+        // Mostra a lista de meios
+        printf("Lista de meios:\n\n");
+        for (int i = 0; i < count; i++) {
+            printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nLocal: %s\nGeocodigo: %s\nReserva: %d\n\n",
+                m[i].id, m[i].tipo, m[i].custo, m[i].bateria, m[i].local, m[i].local_grafo, m[i].reserva);
+        }
+
+        // Fecha o ficheiro
+        fclose(txt_meio);
+        getchar();
     }
 
-    fclose(txt_meio);
-    getchar();
+    if (order_by == 'd') {
+
+    }
 }
 
 // Função para remover um meio

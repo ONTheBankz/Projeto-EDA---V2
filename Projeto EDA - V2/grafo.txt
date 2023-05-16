@@ -1,19 +1,8 @@
-8 10
-0 rua.das.flores
-1 rua.das.araras
-2 av.marechal.deodoro
-3 rua.joao.pessoa
-4 rua.do.ribeiro
-5 rua.alberto.silva
-6 rua.da.praia
-7 av.dos.estados
-0 1 10 2.50
-0 2 5 1.20
-1 3 7 1.90
-2 3 4 1.00
-2 4 2 0.50
-3 4 5 1.30
-4 5 3 0.70
-4 6 9 2.10
-5 7 8 1.80
-6 7 6 1.50
+ID: 0, Nome: rua.das.flores
+ID: 1, Nome: rua.das.araras
+ID: 2, Nome: rua.dos.jasmins
+ID: 3, Nome: rua.dos.colibris
+ID: 4, Nome: rua.dos.ipes
+ID: 5, Nome: rua.dos.sabias
+ID: 6, Nome: rua.dos.lirios
+ID: 7, Nome: rua.dos.beija-flores

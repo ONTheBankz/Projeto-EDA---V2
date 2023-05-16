@@ -10,24 +10,24 @@ int main() {
     registo* headR = NULL;
     cliente* headC = NULL;
     gestor* headG = NULL;
+    grafo* headV = NULL;
     meio* headM = NULL;
 
     // Verifica se o arquivo existe
     FILE* fp = fopen("grafo.txt", "r");
     if (fp) {
-        // Se o arquivo existir, carrega o grafo a partir do arquivo e exibe o menu
+        // Se o arquivo existir, exibe o menu
         fclose(fp);
-        grafo* g = carregarGrafo("grafo.txt");
-        showMenu(&headC, &headG, &headM, &headR);
+        showMenu(&headC, &headG, &headM, &headR, &headV);
     }
     else {
         // Se o arquivo não existir, cria um novo grafo, salva-o no arquivo e exibe o menu
-        grafo* g = criarGrafo();
-        salvarGrafo(g, "grafo.txt");
-        showMenu(&headC, &headG, &headM, &headR);
+        headV = criarGrafo();
+        salvarGrafo(headV);
+        showMenu(&headC, &headG, &headM, &headR, &headV);
         // Libera a memória alocada para o grafo após o uso.
-        free(g->vertices);
-        free(g);
+        free(headV->vertices);
+        free(headV);
     }
     return 0;
 }
