@@ -118,7 +118,7 @@ void atualizarBinGestor(FILE** f, gestor* head) {
 }
 
 // Função para fazer login (Gestor)
-void loginGestor(gestor** head, meio** headM, registo** headR, grafo** headV) {
+void loginGestor(gestor** head, meio** headM, registo** headR, grafo** headV, aresta** headA) {
     char username[50];
     char password[50];
 
@@ -141,7 +141,7 @@ void loginGestor(gestor** head, meio** headM, registo** headR, grafo** headV) {
             system("clear || cls");
             printf("Bem-vindo, %s!\n", curr->nome);
             getchar();
-            showMenuGestor(headM, headR, headV);
+            showMenuGestor(headM, headR, headV, headA);
             if (prev != NULL) {
                 prev->seguinte = curr->seguinte;
                 curr->seguinte = *head;
@@ -399,9 +399,9 @@ void registarAluguerGestor(registo** headR) {
     curr_meio = head_meio;
     while (curr_meio != NULL) {
         if (curr_meio->reserva != 1) {
-            printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nLocal: %s\nGeocodigo: %s\nReserva: %d\n\n", 
+            printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nGeocodigo: %s\nReserva: %d\n\n", 
                 curr_meio->id, curr_meio->tipo, curr_meio->custo, curr_meio->bateria,
-                curr_meio->local, curr_meio->local_grafo, curr_meio->reserva);
+                curr_meio->local_grafo, curr_meio->reserva);
         }
         curr_meio = curr_meio->seguinte;
     }
@@ -613,7 +613,7 @@ void carregarSaldoGestor() {
 }
 
 // Menu Gestor
-void showMenuGestor(meio** headM, registo** headR, grafo** headV) {
+void showMenuGestor(meio** headM, registo** headR, grafo** headV, aresta** headA) {
     int opcao;
     char order_by;
     do {
@@ -774,7 +774,7 @@ void showMenuGestor(meio** headM, registo** headR, grafo** headV) {
         case 19:
             system("clear || cls");
             printf("\REMOVER CONEXAO (LOCAIS)\n\n");
-      
+            removerAresta(headA);
             break;
 
         case 0:

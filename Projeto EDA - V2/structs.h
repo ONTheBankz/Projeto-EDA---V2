@@ -24,7 +24,6 @@ typedef struct meio {
     float custo;
     float bateria;
     char tipo[50];
-    char local[50];
     char local_grafo[50];
     struct meio* seguinte;
 } meio;
@@ -83,7 +82,7 @@ gestor* lerGestor(FILE* f);
 void lerGestores(FILE* f, gestor** head);
 void atualizarGestor(FILE** f, gestor* head);
 void atualizarBinGestor(FILE** f, gestor* head);
-void loginGestor(gestor** head, meio** headM, registo** headR, grafo** headV);
+void loginGestor(gestor** head, meio** headM, registo** headR, grafo** headV, aresta** headA);
 void listarGestor();
 void removerGestor();
 void alterarGestor();
@@ -102,6 +101,7 @@ void alterarMeio();
 // FUNÇÕES GRAFO
 grafo* criarGrafo();
 grafo* carregarGrafo();
+aresta* carregarAresta();
 vertice* buscarVertice(grafo* g, int id);
 void salvarGrafo(grafo* g);
 void criarVertice(grafo* g);
@@ -109,6 +109,9 @@ void editarVertice(grafo* g);
 void removerVertice(grafo* g);
 void imprimirVertices(grafo* g);
 void criarAresta(grafo* g);
+void removerAresta(aresta* a);
+void imprimirAresta(aresta* a);
+void atualizarAresta(aresta* a);
 
 // FUNÇÕES ALUGUER
 void registarAluguer(int id_cliente, registo** head);
@@ -119,6 +122,6 @@ void listarAluguer();
 void cancelarAluguer();
 
 // FUNÇÕES MENU
-void showMenu(cliente** headC, gestor** headG, meio** headM, registo** headR, grafo** headV);
-void showMenuGestor(meio** headM, registo** headR, grafo** headV);
+void showMenu(cliente** headC, gestor** headG, meio** headM, registo** headR, grafo** headV, aresta** headA);
+void showMenuGestor(meio** headM, registo** headR, grafo** headV, aresta** headA);
 void showMenuCliente(registo** headR);

@@ -53,8 +53,8 @@ void registarAluguer(int id_cliente, registo** headR) {
     curr_meio = head_meio;
     while (curr_meio != NULL) {
         if (curr_meio->reserva != 1) {
-            printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nLocal: %s\n\n", curr_meio->id,
-                curr_meio->tipo, curr_meio->custo, curr_meio->bateria, curr_meio->local);
+            printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nGeocodigo: %s\n\n", curr_meio->id,
+                curr_meio->tipo, curr_meio->custo, curr_meio->bateria, curr_meio->local_grafo);
         }
         curr_meio = curr_meio->seguinte;
     }

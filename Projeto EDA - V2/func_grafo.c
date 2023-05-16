@@ -87,6 +87,50 @@ grafo* carregarGrafo() {
     return g;
 }
 
+aresta* carregarAresta() {
+    // Open the file in read mode
+    FILE* arquivo = fopen("arestas.txt", "r");
+    if (arquivo == NULL) {
+        printf("Erro: Falha ao abrir o arquivo.\n");
+        return NULL;
+    }
+
+    aresta* lista_arestas = NULL;  // Linked list to store the edges
+
+    // Read the values from the file and create edges
+    int id_origem, id_destino, peso;
+    while (fscanf(arquivo, "%d %d %d", &id_origem, &id_destino, &peso) == 3) {
+        // Create a new edge
+        aresta* nova_aresta = (aresta*)malloc(sizeof(aresta));
+        if (nova_aresta == NULL) {
+            printf("Erro: Falha ao alocar memoria para a nova aresta.\n");
+            fclose(arquivo);
+            return lista_arestas;
+        }
+        nova_aresta->id_origem = id_origem;
+        nova_aresta->id_destino = id_destino;
+        nova_aresta->peso = peso;
+        nova_aresta->proxima = NULL;
+
+        // Add the edge to the linked list
+        if (lista_arestas == NULL) {
+            lista_arestas = nova_aresta;
+        }
+        else {
+            aresta* atual = lista_arestas;
+            while (atual->proxima != NULL) {
+                atual = atual->proxima;
+            }
+            atual->proxima = nova_aresta;
+        }
+    }
+
+    // Close the file
+    fclose(arquivo);
+
+    return lista_arestas;
+}
+
 vertice* buscarVertice(grafo* g, int id) {
     g = carregarGrafo();
     vertice* atual = g->vertices;
@@ -286,28 +330,35 @@ void criarAresta(grafo* g) {
     imprimirVertices(g);
 
     // Obter as entradas do usuário
-    printf("\nDigite o ID do vertice de origem: ");
+    printf("\nDigite o ID da localizacao de origem: ");
     scanf("%d", &id_origem);
 
-    printf("Digite o ID do vertice de destino: ");
+    printf("Digite o ID da localizacao de destino: ");
     scanf("%d", &id_destino);
 
     // Verificar se os IDs de origem e destino existem nos vértices do grafo
     vertice* vertice_origem = buscarVertice(g, id_origem);
     vertice* vertice_destino = buscarVertice(g, id_destino);
     if (vertice_origem == NULL || vertice_destino == NULL) {
-        printf("\nErro: IDs de origem ou destino invalidos.\n");
+        printf("\nErro: IDs de origem e/ou destino invalidos.\n");
         getchar();
         return;
     }
 
-    printf("Digite o peso da aresta: ");
+    // Verificar se o ID de origem é igual ao ID de destino
+    if (id_origem == id_destino) {
+        printf("\nErro: O ID de origem nao pode ser igual ao ID de destino.\n");
+        getchar();
+        return;
+    }
+
+    printf("Digite a distancia: ");
     scanf("%d", &peso);
 
     // Criar uma nova aresta
     aresta* nova_aresta = (aresta*)malloc(sizeof(aresta));
     if (nova_aresta == NULL) {
-        printf("Erro: Falha ao alocar memoria para a nova aresta.\n");
+        printf("Erro: Falha ao alocar memoria para a nova conexao.\n");
         return;
     }
     nova_aresta->id_origem = id_origem;
@@ -332,6 +383,95 @@ void criarAresta(grafo* g) {
     printf("\nConexao das localizacoes criada com sucesso!\n");
     getchar();
 }
+
+void removerAresta(aresta* a) {
+    a = carregarAresta();
+    if (a == NULL) {
+        printf("Erro: Lista de conexoes vazia.\n");
+        getchar();
+        return;
+    }
+
+    imprimirAresta(a);
+
+    int id_origem, id_destino;
+    printf("\nDigite o ID da localizacao de origem da conexao a ser removida: ");
+    scanf("%d", &id_origem);
+
+    printf("\nDigite o ID da localizacao de destino da conexao a ser removida: ");
+    scanf("%d", &id_destino);
+
+    aresta* anterior = NULL;
+    aresta* atual = a;
+
+    // Traverse the linked list to find the edge to be removed
+    while (atual != NULL) {
+        if (atual->id_origem == id_origem && atual->id_destino == id_destino) {
+            // Edge found, remove it from the linked list
+            if (anterior == NULL) {
+                a = atual->proxima;
+            }
+            else {
+                anterior->proxima = atual->proxima;
+            }
+
+            // Free the memory occupied by the edge
+            free(atual);
+            printf("\Conexao removida com sucesso.\n");
+            getchar();
+            // Update the file
+            atualizarAresta(a);
+
+            return;
+        }
+
+        anterior = atual;
+        atual = atual->proxima;
+    }
+
+    printf("\nErro: Conexao nao encontrada.\n");
+    getchar();
+}
+
+void imprimirAresta(aresta* a) {
+    a = carregarAresta();
+    printf("\nLista de conexoes:\n\n");
+    aresta* atual = a;
+    while (atual != NULL) {
+        printf("Origem: %d, Destino: %d, Peso: %d\n", atual->id_origem, atual->id_destino, atual->peso);
+        atual = atual->proxima;
+    }
+}
+
+void atualizarAresta(aresta* a) {
+    // Open the file in write mode (this will clear its contents)
+    FILE* arquivo = fopen("arestas.txt", "w");
+    if (arquivo == NULL) {
+        printf("Erro: Falha ao abrir o arquivo.\n");
+        return;
+    }
+
+    // Write the edges from the linked list to the file
+    aresta* atual = a;
+    while (atual != NULL) {
+        fprintf(arquivo, "%d %d %d\n", atual->id_origem, atual->id_destino, atual->peso);
+        atual = atual->proxima;
+    }
+
+    // Close the file
+    fclose(arquivo);
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 

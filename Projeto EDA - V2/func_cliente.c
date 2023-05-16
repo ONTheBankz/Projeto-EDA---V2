@@ -497,8 +497,8 @@ void listarMeioCliente(char order_by) {
     // Criar array de meios
     meio m[100];
     int count = 0;
-    while (fscanf(file, "%d %s %f %f %s %s %d\n", &m[count].id, m[count].tipo, &m[count].custo, &m[count].bateria,
-        m[count].local, m[count].local_grafo, &m[count].reserva) != EOF) {
+    while (fscanf(file, "%d %s %f %f %s %d\n", &m[count].id, m[count].tipo, &m[count].custo, &m[count].bateria,
+            m[count].local_grafo, &m[count].reserva) != EOF) {
         if (m[count].reserva == 1) {
             continue; // saltar a adição do meio ao array caso reserva = 1
         }
@@ -526,8 +526,8 @@ void listarMeioCliente(char order_by) {
         if (m[i].reserva == 1) {
             continue; // Saltar o meio
         }
-        printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nLocal: %s\n\n", m[i].id, m[i].tipo,
-            m[i].custo, m[i].bateria, m[i].local);
+        printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\Geocodigo: %s\n\n", m[i].id, m[i].tipo,
+            m[i].custo, m[i].bateria, m[i].local_grafo);
         printed_count++;
     }
     if (printed_count == 0) {
