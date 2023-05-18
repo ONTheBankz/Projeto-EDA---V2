@@ -1,3 +1,9 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+#include <time.h>
 
 typedef struct cliente {
     int id;
@@ -91,7 +97,7 @@ void registarAluguerGestor(registo** headR);
 
 // FUNÇÕES MEIO
 void registarMeio(meio** head, grafo** g);
-void listarMeio(char order_by, grafo** g);
+void listarMeio(char order_by);
 void lerMeios(FILE* f, meio** head);
 void atualizarMeio(FILE** f, meio* head_meio);
 void atualizarBinMeio(FILE** f, meio* head_meio);
@@ -108,10 +114,16 @@ void criarVertice(grafo* g);
 void editarVertice(grafo* g);
 void removerVertice(grafo* g);
 void imprimirVertices(grafo* g);
+char* obterNomeVertice(grafo* g, int id_vertice);
+void compararNomesVertices(grafo* g, meio* m, char** nomesVertices, int numVertices);
 void criarAresta(grafo* g);
 void removerAresta(aresta* a);
 void imprimirAresta(aresta* a);
 void atualizarAresta(aresta* a);
+void verConexoesRaio(grafo* g, aresta* a, meio* m);
+void encontrarConexoes(grafo* g, aresta* a, meio* m, int id_origem, float raio);
+void imprimirConexoes(int origem, int destino, int distancia);
+
 
 // FUNÇÕES ALUGUER
 void registarAluguer(int id_cliente, registo** head);

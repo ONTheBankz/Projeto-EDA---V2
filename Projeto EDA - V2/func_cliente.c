@@ -487,27 +487,26 @@ void listarAluguerCliente(int id_cliente) {
 
 // Função para listar um meio
 void listarMeioCliente(char order_by) {
-    // Abrir ficheiro em modo leitura
-    FILE* file = fopen("meios.txt", "r");
-    if (file == NULL) {
+    // Abre o ficheiro de meios
+    FILE* txt_meio = fopen("meios.txt", "r");
+    if (txt_meio == NULL) {
         printf("Erro ao abrir arquivo!\n");
         exit(1);
     }
 
-    // Criar array de meios
+    // Cria um array de meios
     meio m[100];
     int count = 0;
-    while (fscanf(file, "%d %s %f %f %s %d\n", &m[count].id, m[count].tipo, &m[count].custo, &m[count].bateria,
-            m[count].local_grafo, &m[count].reserva) != EOF) {
-        if (m[count].reserva == 1) {
-            continue; // saltar a adição do meio ao array caso reserva = 1
-        }
+    while (fscanf(txt_meio, "%d %s %f %f %s %d\n", &m[count].id, m[count].tipo, &m[count].custo,
+        &m[count].bateria, m[count].local_grafo, &m[count].reserva) != EOF) {
         count++;
     }
 
-    // Lista de ordenação
+    // Fecha o ficheiro
+    fclose(txt_meio);
+
+    // Ordena o array por bateria
     if (order_by == 'b') {
-        // Ordenar por bateria
         for (int i = 0; i < count - 1; i++) {
             for (int j = 0; j < count - i - 1; j++) {
                 if (m[j].bateria < m[j + 1].bateria) {
@@ -517,24 +516,33 @@ void listarMeioCliente(char order_by) {
                 }
             }
         }
+        printf("Lista de meios ordenada por bateria:\n\n");
     }
-    
-    // Mostrar lista de meios
-    int printed_count = 0;
-    printf("Lista de meios:\n\n");
-    for (int i = 0; i < count; i++) {
-        if (m[i].reserva == 1) {
-            continue; // Saltar o meio
+    else if (order_by == 'c') {
+        // Ordena por custo
+        for (int i = 0; i < count - 1; i++) {
+            for (int j = 0; j < count - i - 1; j++) {
+                if (m[j].custo < m[j + 1].custo) {
+                    meio temp = m[j];
+                    m[j] = m[j + 1];
+                    m[j + 1] = temp;
+                }
+            }
         }
-        printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\Geocodigo: %s\n\n", m[i].id, m[i].tipo,
-            m[i].custo, m[i].bateria, m[i].local_grafo);
-        printed_count++;
+        printf("Lista de meios ordenada por custo:\n\n");
     }
-    if (printed_count == 0) {
-        printf("Nao existem meios disponiveis no momento.\n");
+    else {
+        printf("Opcao de ordenacao invalida.\n");
+        return;
     }
 
-    fclose(file);
+    // Mostra os meios com o campo reserva = 0
+    for (int i = 0; i < count; i++) {
+        if (m[i].reserva == 0) {
+            printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nGeocodigo: %s\n\n",
+                m[i].id, m[i].tipo, m[i].custo, m[i].bateria, m[i].local_grafo);
+        }
+    }
     getchar();
 }
 
@@ -545,7 +553,8 @@ void terminarAluguer(int id_cliente) {
     cliente c;
     meio m;
     int meio_id, cliente_id, registo_id;
- 
+    int bateria_decrementa, minutos_diferenca;
+    
     // Recebe o tempo atual
     time_t now = time(NULL);
     struct tm* current_time = localtime(&now);
@@ -639,7 +648,8 @@ void terminarAluguer(int id_cliente) {
     while (curr_registo != NULL) {
         if (curr_registo->id == registo_id) {
     // Cálculo para encontrar a diferença em minutos da data de início e fim da viagem
-    int minutes_difference = ((current_time->tm_hour * 60) + current_time->tm_min) - ((curr_registo->horas * 60) + curr_registo->minutos);
+        minutos_diferenca = ((current_time->tm_hour * 60) + current_time->tm_min) -
+        ((curr_registo->horas * 60) + curr_registo->minutos);
             // Encontrar o meio com o ID associado ao registo
             meio_id = curr_registo->meio_id;
             cliente_id = curr_registo->cliente_id;
@@ -656,9 +666,9 @@ void terminarAluguer(int id_cliente) {
             while (curr != NULL) {
                 if (curr->id == cliente_id) {
                     // Verificar se o saldo é suficiente para cobrir o custo do meio
-                    if (curr->saldo >= (curr_meio->custo * minutes_difference)) {
+                    if (curr->saldo >= (curr_meio->custo * minutos_diferenca)) {
                         // Decrementar o saldo do cliente pelo custo do meio
-                        curr->saldo -= (curr_meio->custo * minutes_difference);
+                        curr->saldo -= (curr_meio->custo * minutos_diferenca);
                     }
                     else {
                         system("clear || cls");
@@ -672,6 +682,14 @@ void terminarAluguer(int id_cliente) {
             }
             // Atualizar o campo "reserva" para 0
             curr_meio->reserva = 0;
+            // Retira 10% da bateria por minuto passado
+            bateria_decrementa = minutos_diferenca * 10;
+            curr_meio->bateria -= bateria_decrementa;
+
+            // Verifica se a bateria chega ao fim
+            if (curr_meio->bateria < 0) {
+                curr_meio->bateria = 0;
+            }
 
             // Remover o registo da lista
             if (prev_registo == NULL) {
@@ -815,10 +833,10 @@ void showMenuCliente(registo** headR) {
 
         case 2:
             system("clear || cls");
-            printf("\nCONSULTAR MEIO(S)\n\n");
-            printf("Como deseja ordenar a lista de meios?\n\n");
+            printf("\CONSULTAR MEIOS\n\n");
+            printf("Como deseja ordenar a lista de meios?\n");
             printf("B - Por bateria\n");
-            printf("D - Por distancia\n\n");
+            printf("C - por custo\n");
             printf("Opcao: ");
             scanf(" %c", &order_by);
             printf("\n\n");

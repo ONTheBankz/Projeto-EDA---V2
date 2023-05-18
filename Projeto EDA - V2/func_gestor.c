@@ -649,6 +649,7 @@ void showMenuGestor(meio** headM, registo** headR, grafo** headV, aresta** headA
         printf("17 - Remover localizacao\n");
         printf("18 - Registar conexao (locais)\n");
         printf("19 - Remover conexao (locais)\n");
+        printf("20 - Listar meios por raio (distancia)\n");
         printf("OUTROS\n\n");
         printf("Escolha uma opcao:\n");
         printf("0 - Sair\n");
@@ -709,11 +710,11 @@ void showMenuGestor(meio** headM, registo** headR, grafo** headV, aresta** headA
             printf("\nLISTAR MEIO\n\n");
             printf("Como deseja ordenar a lista de meios?\n");
             printf("B - Por bateria\n");
-            printf("D - Por distancia\n\n");
+            printf("C - por custo\n");
             printf("Opcao: ");
             scanf(" %c", &order_by);
             printf("\n\n");
-            listarMeio(order_by, headV);
+            listarMeio(order_by);
             break;
  
         case 10:
@@ -749,7 +750,6 @@ void showMenuGestor(meio** headM, registo** headR, grafo** headV, aresta** headA
         case 15:
             system("clear || cls");
             printf("\nREGISTAR LOCALIZACAO\n\n");
-            // Adiciona o novo vértice e conecta ás arestas
             criarVertice(headV);
             break;
 
@@ -775,6 +775,12 @@ void showMenuGestor(meio** headM, registo** headR, grafo** headV, aresta** headA
             system("clear || cls");
             printf("\REMOVER CONEXAO (LOCAIS)\n\n");
             removerAresta(headA);
+            break;
+
+        case 20:
+            system("clear || cls");
+            printf("\LISTAR MEIOS RAIO (DISTANCIA)\n\n");
+            verConexoesRaio(headV, headA, headM);
             break;
 
         case 0:

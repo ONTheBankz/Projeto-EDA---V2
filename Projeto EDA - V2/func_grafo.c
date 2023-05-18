@@ -1,6 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <time.h>
 #include "structs.h"
@@ -324,6 +325,60 @@ void imprimirVertices(grafo* g) {
     }
 }
 
+char* obterNomeVertice(grafo* g, int id_vertice) {
+    vertice* verticePtr = g->vertices;
+    while (verticePtr != NULL && verticePtr->id != id_vertice) {
+        verticePtr = verticePtr->seguinte;
+    }
+
+    if (verticePtr != NULL) {
+        return _strdup(verticePtr->nome);
+    }
+
+    return NULL;
+}
+
+void compararNomesVertices(grafo* g, meio* m, char** nomesVertices, int numVertices) {
+    // Abrir arquivo em modo de leitura
+    FILE* txt_file = fopen("meios.txt", "r");
+    if (txt_file == NULL) {
+        system("clear || cls");
+        printf("Erro ao abrir arquivo!\n");
+        getchar();
+        exit(1);
+    }
+
+    // Ler todos os meios para uma lista ligada
+    meio* head = NULL;
+    meio* curr = NULL;
+    lerMeios(txt_file, &head);
+    fclose(txt_file);
+
+    printf("\nMeios disponiveis nos locais:\n\n");
+
+    // Percorrer os nomes dos vizinhos encontrados
+    for (int i = 0; i < numVertices; i++) {
+        char* nomeVizinho = nomesVertices[i];
+
+        // Percorrer a lista de meios
+        curr = head;
+        while (curr != NULL) {
+            // Comparar o nome do vizinho com o local_grafo do meio
+            if (strcmp(nomeVizinho, curr->local_grafo) == 0) {
+                // Meio encontrado no local vizinho, imprimir informações
+                printf("ID: %d\n", curr->id);
+                printf("Tipo: %s\n", curr->tipo);
+                printf("Custo: %.2f\n", curr->custo);
+                printf("Bateria: %.2f\n", curr->bateria);
+                printf("Local: %s\n", curr->local_grafo);
+                printf("Reserva: %d\n", curr->reserva);
+                printf("\n");
+            }
+            curr = curr->seguinte;
+        }
+    }
+}
+
 void criarAresta(grafo* g) {
     g = carregarGrafo();
     int id_origem, id_destino, peso;
@@ -461,6 +516,96 @@ void atualizarAresta(aresta* a) {
     // Close the file
     fclose(arquivo);
 }
+
+void verConexoesRaio(grafo* g, aresta* a, meio* m) {
+    g = carregarGrafo();
+    a = carregarAresta();
+    imprimirVertices(g);
+
+    int id_origem;
+    float raio;
+
+    printf("\nDigite o ID onde se encontra: ");
+    scanf("%d", &id_origem);
+
+    printf("Digite o raio de distancia: ");
+    scanf("%f", &raio);
+
+    printf("\nConexoes dentro do raio de %.2f a partir do ID %d:\n\n", raio, id_origem);
+    encontrarConexoes(g, a, m, id_origem, raio);
+    getchar();
+}
+
+void encontrarConexoes(grafo* g, aresta* a, meio* m, int id_origem, float raio) {
+    // Criar uma lista ligada para acompanhar os vértices visitados
+    bool* visitados = calloc(g->num_vertices, sizeof(bool));
+    // Criar uma lista ligada para armazenar as distâncias acumuladas
+    int* distanciasAcumuladas = calloc(g->num_vertices, sizeof(int));
+    // Criar uma lista ligada para armazenar os nomes dos vizinhos
+    char** nomesVertices = calloc(g->num_vertices, sizeof(char*));
+    int numVertices = 0;
+
+    // Marcar o vértice de origem como visitado e inseri-lo na lista
+    visitados[id_origem] = true;
+    int* fila = malloc(g->num_vertices * sizeof(int));
+    int inicio = 0, fim = 0;
+    fila[fim++] = id_origem;
+
+    while (inicio != fim) {
+        int verticeAtual = fila[inicio++];
+        vertice* verticeAtualPtr = buscarVertice(g, verticeAtual);
+
+        if (verticeAtualPtr == NULL) {
+            continue;  // Vértice não encontrado no grafo
+        }
+
+        for (aresta* arestaAtual = a; arestaAtual != NULL; arestaAtual = arestaAtual->proxima) {
+            int idVertice = -1;
+
+            if (arestaAtual->id_origem == verticeAtual && !visitados[arestaAtual->id_destino]) {
+                idVertice = arestaAtual->id_destino;
+            }
+            else if (arestaAtual->id_destino == verticeAtual && !visitados[arestaAtual->id_origem]) {
+                idVertice = arestaAtual->id_origem;
+            }
+
+            if (idVertice != -1) {
+                vertice* vizinhoPtr = buscarVertice(g, idVertice);
+
+                if (vizinhoPtr != NULL) {
+                    int distanciaAcumulada = distanciasAcumuladas[verticeAtual] + arestaAtual->peso;
+
+                    if (distanciaAcumulada <= raio) {
+                        visitados[idVertice] = true;
+                        fila[fim++] = idVertice;
+                        distanciasAcumuladas[idVertice] = distanciaAcumulada;
+                        nomesVertices[numVertices] = obterNomeVertice(g, idVertice);
+                        numVertices++;
+                        imprimirConexoes(verticeAtual, idVertice, distanciaAcumulada);
+                    }
+                }
+            }
+        }
+    }
+        compararNomesVertices(g, m, nomesVertices, numVertices);
+}
+
+void imprimirConexoes(int origem, int destino, int distancia) {
+    printf("Origem: %d, Destino: %d, Distancia: %d\n", origem, destino, distancia);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

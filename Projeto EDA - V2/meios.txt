@@ -1,3 +1,8 @@
-1 Bike 0.40 50.00 rua.das.flores 0
-2 Troti 0.20 30.00 rua.das.araras 0
-3 Skate 0.30 60.00 av.marechal.deodoro 0
+1 Bicicleta 0.50 75.00 rua.das.flores 0
+2 Trotinete 0.30 50.00 rua.das.araras 0
+3 Bicicleta_2 0.40 65.00 rua.dos.jasmins 0
+4 Trotinete_2 0.20 40.00 rua.dos.colibris 0
+5 Bicicleta_3 0.60 35.00 rua.dos.ipes 0
+6 Trotinete_3 0.40 70.00 rua.dos.sabias 0
+7 Bicicleta_4 0.30 20.00 rua.dos.lirios 0
+8 Trotinete_4 0.50 80.00 rua.dos.beija-flores 0

@@ -147,25 +147,27 @@ void atualizarBinMeio(FILE** f, meio* head_meio) {
 }
 
 // Função para listar um meio
-void listarMeio(char order_by, grafo** g) {
-    g = carregarGrafo("grafo.txt");
+void listarMeio(char order_by) {
+    // Abre o ficheiro de meios
+    FILE* txt_meio = fopen("meios.txt", "r");
+    if (txt_meio == NULL) {
+        printf("Erro ao abrir arquivo!\n");
+        exit(1);
+    }
+
+    // Cria o array de meios
+    meio m[100];
+    int count = 0;
+    while (fscanf(txt_meio, "%d %s %f %f %s %d\n", &m[count].id, m[count].tipo, &m[count].custo,
+        &m[count].bateria, m[count].local_grafo, &m[count].reserva) != EOF) {
+        count++;
+    }
+
+    // Fecha o ficheiro
+    fclose(txt_meio);
+
+    // Ordena por bateria
     if (order_by == 'b') {
-        // Abre o ficheiro com os meios
-        FILE* txt_meio = fopen("meios.txt", "r");
-        if (txt_meio == NULL) {
-            printf("Erro ao abrir arquivo!\n");
-            exit(1);
-        }
-
-        // Cria um array com os meios
-        meio m[100];
-        int count = 0;
-        while (fscanf(txt_meio, "%d %s %f %f %s %d\n", &m[count].id, m[count].tipo, &m[count].custo, 
-            &m[count].bateria, m[count].local_grafo, &m[count].reserva) != EOF) {
-            count++;
-        }
-
-        // Ordenar por bateria
         for (int i = 0; i < count - 1; i++) {
             for (int j = 0; j < count - i - 1; j++) {
                 if (m[j].bateria < m[j + 1].bateria) {
@@ -175,22 +177,32 @@ void listarMeio(char order_by, grafo** g) {
                 }
             }
         }
-
-        // Mostra a lista de meios
-        printf("Lista de meios:\n\n");
-        for (int i = 0; i < count; i++) {
-            printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nGeocodigo: %s\nReserva: %d\n\n",
-                m[i].id, m[i].tipo, m[i].custo, m[i].bateria, m[i].local_grafo, m[i].reserva);
+        printf("Lista de meios ordenada por bateria:\n\n");
+    }
+    else if (order_by == 'c') {
+        // Ordena por custo
+        for (int i = 0; i < count - 1; i++) {
+            for (int j = 0; j < count - i - 1; j++) {
+                if (m[j].custo < m[j + 1].custo) {
+                    meio temp = m[j];
+                    m[j] = m[j + 1];
+                    m[j + 1] = temp;
+                }
+            }
         }
-
-        // Fecha o ficheiro
-        fclose(txt_meio);
-        getchar();
+        printf("Lista de meios ordenada por custo:\n\n");
+    }
+    else {
+        printf("Opcao de ordenacao invalida.\n");
+        return;
     }
 
-    if (order_by == 'd') {
-
+    // Mostra a lista de meios
+    for (int i = 0; i < count; i++) {
+        printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nGeocodigo: %s\nReserva: %d\n\n",
+            m[i].id, m[i].tipo, m[i].custo, m[i].bateria, m[i].local_grafo, m[i].reserva);
     }
+    getchar();
 }
 
 // Função para remover um meio
