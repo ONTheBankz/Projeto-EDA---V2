@@ -338,7 +338,7 @@ char* obterNomeVertice(grafo* g, int id_vertice) {
     return NULL;
 }
 
-void compararNomesVertices(grafo* g, meio* m, char** nomesVertices, int numVertices) {
+void compararNomesVertices(grafo* g, meio* m, char** nomesVertices, int numVertices, const char* tipo_meio) {
     // Abrir arquivo em modo de leitura
     FILE* txt_file = fopen("meios.txt", "r");
     if (txt_file == NULL) {
@@ -356,16 +356,22 @@ void compararNomesVertices(grafo* g, meio* m, char** nomesVertices, int numVerti
 
     printf("\nMeios disponiveis nos locais:\n\n");
 
+    // Verificar se o tipo_meio é "Bicicleta" ou "Trotinete"
+    if (strcmp(tipo_meio, "Bicicleta") != 0 && strcmp(tipo_meio, "Trotinete") != 0) {
+        printf("Tipo de meio inválido! Deve ser 'Bicicleta' ou 'Trotinete'.\n");
+        return;
+    }
+
     // Percorrer os nomes dos vizinhos encontrados
     for (int i = 0; i < numVertices; i++) {
-        char* nomeVizinho = nomesVertices[i];
+        char* nomeVertice = nomesVertices[i];
 
         // Percorrer a lista de meios
         curr = head;
         while (curr != NULL) {
-            // Comparar o nome do vizinho com o local_grafo do meio
-            if (strcmp(nomeVizinho, curr->local_grafo) == 0) {
-                // Meio encontrado no local vizinho, imprimir informações
+            // Comparar o nome do vizinho com o local_grafo do meio e o tipo
+            if (strcmp(nomeVertice, curr->local_grafo) == 0 && strcmp(tipo_meio, curr->tipo) == 0) {
+                // Meio encontrado no local vizinho e do tipo desejado, imprimir informações
                 printf("ID: %d\n", curr->id);
                 printf("Tipo: %s\n", curr->tipo);
                 printf("Custo: %.2f\n", curr->custo);
@@ -524,24 +530,29 @@ void verConexoesRaio(grafo* g, aresta* a, meio* m) {
 
     int id_origem;
     float raio;
+    char tipo_meio[50];
 
     printf("\nDigite o ID onde se encontra: ");
     scanf("%d", &id_origem);
+
+    printf("Digite o tipo de meio (Bicicleta ou Trotinete): ");
+ 
+    scanf("%s", tipo_meio);
 
     printf("Digite o raio de distancia: ");
     scanf("%f", &raio);
 
     printf("\nConexoes dentro do raio de %.2f a partir do ID %d:\n\n", raio, id_origem);
-    encontrarConexoes(g, a, m, id_origem, raio);
+    encontrarConexoes(g, a, m, id_origem, raio, tipo_meio);
     getchar();
 }
 
-void encontrarConexoes(grafo* g, aresta* a, meio* m, int id_origem, float raio) {
-    // Criar uma lista ligada para acompanhar os vértices visitados
+void encontrarConexoes(grafo* g, aresta* a, meio* m, int id_origem, float raio, const char* tipo_meio) {
+    // Criar uma lista ligada para armazenar os vértices visitados
     bool* visitados = calloc(g->num_vertices, sizeof(bool));
     // Criar uma lista ligada para armazenar as distâncias acumuladas
     int* distanciasAcumuladas = calloc(g->num_vertices, sizeof(int));
-    // Criar uma lista ligada para armazenar os nomes dos vizinhos
+    // Criar uma lista ligada para armazenar os nomes dos vertices
     char** nomesVertices = calloc(g->num_vertices, sizeof(char*));
     int numVertices = 0;
 
@@ -556,6 +567,7 @@ void encontrarConexoes(grafo* g, aresta* a, meio* m, int id_origem, float raio) 
         vertice* verticeAtualPtr = buscarVertice(g, verticeAtual);
 
         if (verticeAtualPtr == NULL) {
+            printf("Nao existem conexoes com o ID inserido\n");
             continue;  // Vértice não encontrado no grafo
         }
 
@@ -574,7 +586,6 @@ void encontrarConexoes(grafo* g, aresta* a, meio* m, int id_origem, float raio) 
 
                 if (vizinhoPtr != NULL) {
                     int distanciaAcumulada = distanciasAcumuladas[verticeAtual] + arestaAtual->peso;
-
                     if (distanciaAcumulada <= raio) {
                         visitados[idVertice] = true;
                         fila[fim++] = idVertice;
@@ -587,7 +598,7 @@ void encontrarConexoes(grafo* g, aresta* a, meio* m, int id_origem, float raio) 
             }
         }
     }
-        compararNomesVertices(g, m, nomesVertices, numVertices);
+        compararNomesVertices(g, m, nomesVertices, numVertices, tipo_meio);
 }
 
 void imprimirConexoes(int origem, int destino, int distancia) {

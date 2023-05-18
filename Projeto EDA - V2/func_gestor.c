@@ -399,8 +399,8 @@ void registarAluguerGestor(registo** headR) {
     curr_meio = head_meio;
     while (curr_meio != NULL) {
         if (curr_meio->reserva != 1) {
-            printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nGeocodigo: %s\nReserva: %d\n\n", 
-                curr_meio->id, curr_meio->tipo, curr_meio->custo, curr_meio->bateria,
+            printf("ID: %d\nNome: %s\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nGeocodigo: %s\nReserva: %d\n\n", 
+                curr_meio->id, curr_meio->nome, curr_meio->tipo, curr_meio->custo, curr_meio->bateria,
                 curr_meio->local_grafo, curr_meio->reserva);
         }
         curr_meio = curr_meio->seguinte;
@@ -492,7 +492,7 @@ void registarAluguerGestor(registo** headR) {
 
     fclose(txt_registos); // Fechar o ficheiro
 
-    // Preencher os campos do novo cliente
+    // Preencher os campos do novo registo
     new_registo->id = id_registo;
     new_registo->cliente_id = id_cliente;
     new_registo->meio_id = meio_id;
@@ -642,14 +642,14 @@ void showMenuGestor(meio** headM, registo** headR, grafo** headV, aresta** headA
         printf("12 - Registar aluguer\n");
         printf("13 - Listar aluguer\n");
         printf("14 - Cancelar Aluguer\n\n");
-        printf("LOCALIZACOES\n\n");
+        printf("GRAFOS\n\n");
         printf("Escolha uma opcao:\n");
         printf("15 - Registar localizacao\n");
         printf("16 - Editar localizacao\n");
         printf("17 - Remover localizacao\n");
-        printf("18 - Registar conexao (locais)\n");
-        printf("19 - Remover conexao (locais)\n");
-        printf("20 - Listar meios por raio (distancia)\n");
+        printf("18 - Registar conexao\n");
+        printf("19 - Remover conexao\n");
+        printf("20 - Listar conexoes por raio (distancia)\n\n");
         printf("OUTROS\n\n");
         printf("Escolha uma opcao:\n");
         printf("0 - Sair\n");
@@ -767,19 +767,19 @@ void showMenuGestor(meio** headM, registo** headR, grafo** headV, aresta** headA
 
         case 18:
             system("clear || cls");
-            printf("\REGISTAR CONEXAO (LOCAIS)\n\n");
+            printf("\REGISTAR CONEXAO\n\n");
             criarAresta(headV);
             break;
 
         case 19:
             system("clear || cls");
-            printf("\REMOVER CONEXAO (LOCAIS)\n\n");
+            printf("\REMOVER CONEXAO\n\n");
             removerAresta(headA);
             break;
 
         case 20:
             system("clear || cls");
-            printf("\LISTAR MEIOS RAIO (DISTANCIA)\n\n");
+            printf("\LISTAR CONEXOES RAIO (DISTANCIA)\n\n");
             verConexoesRaio(headV, headA, headM);
             break;
 

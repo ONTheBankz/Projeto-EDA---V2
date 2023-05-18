@@ -456,7 +456,7 @@ void listarAluguerCliente(int id_cliente) {
         }
 
         // Imprimir os dados do registo
-        printf("ID: %d\nCliente: %s\nMeio: %s\nData: %d/%d/%d %d:%d\n\n", curr_registo->id, curr->nome, curr_meio->tipo, 
+        printf("ID: %d\nCliente: %s\nMeio: %s\nData: %d/%d/%d %d:%d\n\n", curr_registo->id, curr->nome, curr_meio->nome, 
         curr_registo->dia, curr_registo->mes, curr_registo->ano, curr_registo->horas, curr_registo->minutos);
         curr_registo = curr_registo->seguinte;
     }
@@ -497,7 +497,7 @@ void listarMeioCliente(char order_by) {
     // Cria um array de meios
     meio m[100];
     int count = 0;
-    while (fscanf(txt_meio, "%d %s %f %f %s %d\n", &m[count].id, m[count].tipo, &m[count].custo,
+    while (fscanf(txt_meio, "%d %s %s %f %f %s %d\n", &m[count].id, m[count].nome, m[count].tipo, &m[count].custo,
         &m[count].bateria, m[count].local_grafo, &m[count].reserva) != EOF) {
         count++;
     }
@@ -539,8 +539,8 @@ void listarMeioCliente(char order_by) {
     // Mostra os meios com o campo reserva = 0
     for (int i = 0; i < count; i++) {
         if (m[i].reserva == 0) {
-            printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nGeocodigo: %s\n\n",
-                m[i].id, m[i].tipo, m[i].custo, m[i].bateria, m[i].local_grafo);
+            printf("ID: %d\nNome: %s\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nGeocodigo: %s\n\n",
+                m[i].id, m[i].nome, m[i].tipo, m[i].custo, m[i].bateria, m[i].local_grafo);
         }
     }
     getchar();
@@ -633,7 +633,7 @@ void terminarAluguer(int id_cliente) {
         }
 
         // Imprimir os dados do registo
-        printf("ID: %d\nCliente: %s\nMeio: %s\nData: %d/%d/%d %d:%d\n\n", curr_registo->id, curr->nome, curr_meio->tipo,
+        printf("ID: %d\nCliente: %s\nMeio: %s\nData: %d/%d/%d %d:%d\n\n", curr_registo->id, curr->nome, curr_meio->nome,
             curr_registo->dia, curr_registo->mes, curr_registo->ano, curr_registo->horas, curr_registo->minutos);
         curr_registo = curr_registo->seguinte;
     }

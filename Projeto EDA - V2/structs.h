@@ -29,6 +29,7 @@ typedef struct meio {
     int reserva;
     float custo;
     float bateria;
+    char nome[50];
     char tipo[50];
     char local_grafo[50];
     struct meio* seguinte;
@@ -115,13 +116,13 @@ void editarVertice(grafo* g);
 void removerVertice(grafo* g);
 void imprimirVertices(grafo* g);
 char* obterNomeVertice(grafo* g, int id_vertice);
-void compararNomesVertices(grafo* g, meio* m, char** nomesVertices, int numVertices);
+void compararNomesVertices(grafo* g, meio* m, char** nomesVertices, int numVertices, const char* tipo_meio);
 void criarAresta(grafo* g);
 void removerAresta(aresta* a);
 void imprimirAresta(aresta* a);
 void atualizarAresta(aresta* a);
 void verConexoesRaio(grafo* g, aresta* a, meio* m);
-void encontrarConexoes(grafo* g, aresta* a, meio* m, int id_origem, float raio);
+void encontrarConexoes(grafo* g, aresta* a, meio* m, int id_origem, float raio, const char* tipo_meio);
 void imprimirConexoes(int origem, int destino, int distancia);
 
 

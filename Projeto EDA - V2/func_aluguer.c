@@ -53,8 +53,8 @@ void registarAluguer(int id_cliente, registo** headR) {
     curr_meio = head_meio;
     while (curr_meio != NULL) {
         if (curr_meio->reserva != 1) {
-            printf("ID: %d\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nGeocodigo: %s\n\n", curr_meio->id,
-                curr_meio->tipo, curr_meio->custo, curr_meio->bateria, curr_meio->local_grafo);
+            printf("ID: %d\nNome: %s\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nGeocodigo: %s\n\n", curr_meio->id,
+              curr_meio->nome, curr_meio->tipo, curr_meio->custo, curr_meio->bateria, curr_meio->local_grafo);
         }
         curr_meio = curr_meio->seguinte;
     }
@@ -338,7 +338,7 @@ void listarAluguer() {
         }
 
         // Imprimir os dados do registo
-        printf("ID: %d\nCliente: %s\nMeio: %s\nData: %d/%d/%d %d:%d\n\n", curr_registo->id, curr->nome, curr_meio->tipo,
+        printf("ID: %d\nCliente: %s\nMeio: %s\nData: %d/%d/%d %d:%d\n\n", curr_registo->id, curr->nome, curr_meio->nome,
             curr_registo->dia, curr_registo->mes, curr_registo->ano, curr_registo->horas, curr_registo->minutos);
         curr_registo = curr_registo->seguinte;
     }
@@ -446,7 +446,7 @@ void cancelarAluguer() {
         }
 
         // Imprimir os dados do registo
-        printf("ID: %d\nCliente: %s\nMeio: %s\nData: %d/%d/%d %d:%d\n\n", curr_registo->id, curr->nome, curr_meio->tipo,
+        printf("ID: %d\nCliente: %s\nMeio: %s\nData: %d/%d/%d %d:%d\n\n", curr_registo->id, curr->nome, curr_meio->nome,
             curr_registo->dia, curr_registo->mes, curr_registo->ano, curr_registo->horas, curr_registo->minutos);
         curr_registo = curr_registo->seguinte;
     }
