@@ -635,21 +635,21 @@ void showMenuGestor(meio** headM, registo** headR, grafo** headV, aresta** headA
         printf("Escolha uma opcao:\n");
         printf("8 - Registar meio\n");
         printf("9 - Listar meio\n");
-        printf("10 - Remover meio\n");
-        printf("11 - Alterar dados meio\n\n");
+        printf("10 - Filtrar meio por raio (distancia)\n");
+        printf("11 - Remover meio\n");
+        printf("12 - Alterar dados meio\n\n");
         printf("ALUGUERES\n\n");
         printf("Escolha uma opcao:\n");
-        printf("12 - Registar aluguer\n");
-        printf("13 - Listar aluguer\n");
-        printf("14 - Cancelar Aluguer\n\n");
+        printf("13 - Registar aluguer\n");
+        printf("14 - Listar aluguer\n");
+        printf("15 - Cancelar Aluguer\n\n");
         printf("GRAFOS\n\n");
         printf("Escolha uma opcao:\n");
-        printf("15 - Registar localizacao\n");
-        printf("16 - Editar localizacao\n");
-        printf("17 - Remover localizacao\n");
-        printf("18 - Registar conexao\n");
-        printf("19 - Remover conexao\n");
-        printf("20 - Listar conexoes por raio (distancia)\n\n");
+        printf("16 - Registar localizacao\n");
+        printf("17 - Editar localizacao\n");
+        printf("18 - Remover localizacao\n");
+        printf("19 - Registar conexao\n");
+        printf("20 - Remover conexao\n\n");
         printf("OUTROS\n\n");
         printf("Escolha uma opcao:\n");
         printf("0 - Sair\n");
@@ -716,71 +716,71 @@ void showMenuGestor(meio** headM, registo** headR, grafo** headV, aresta** headA
             printf("\n\n");
             listarMeio(order_by);
             break;
- 
+
         case 10:
+            system("clear || cls");
+            printf("\FILTRAR MEIO RAIO (DISTANCIA)\n\n");
+            verConexoesRaio(headV, headA, headM, 0);
+            break;
+ 
+        case 11:
             system("clear || cls");
             printf("\nREMOVER MEIO\n\n");
             removerMeio();
             break;
 
-        case 11:
+        case 12:
             system("clear || cls");
             printf("\nALTERAR DADOS MEIO\n\n");
             alterarMeio();
             break;
         
-        case 12:
+        case 13:
             system("clear || cls");
             printf("\nREGISTAR ALUGUER\n\n");
             registarAluguerGestor(headR);
             break;
 
-        case 13:
+        case 14:
             system("clear || cls");
             printf("\nLISTAR ALUGUER\n\n");
             listarAluguer();
             break;
 
-        case 14:
+        case 15:
             system("clear || cls");
             printf("\CANCELAR ALUGUER\n\n");
             cancelarAluguer();
             break;
 
-        case 15:
+        case 16:
             system("clear || cls");
             printf("\nREGISTAR LOCALIZACAO\n\n");
             criarVertice(headV);
             break;
 
-        case 16:
+        case 17:
             system("clear || cls");
             printf("\nEDITAR LOCALIZACAO\n\n");
             editarVertice(headV);
             break;
 
-        case 17:
+        case 18:
             system("clear || cls");
             printf("\REMOVER LOCALIZACAO\n\n");
             removerVertice(headV);
             break;
 
-        case 18:
+        case 19:
             system("clear || cls");
             printf("\REGISTAR CONEXAO\n\n");
             criarAresta(headV);
             break;
 
-        case 19:
+        case 20:
             system("clear || cls");
             printf("\REMOVER CONEXAO\n\n");
             removerAresta(headA);
-            break;
-
-        case 20:
-            system("clear || cls");
-            printf("\LISTAR CONEXOES RAIO (DISTANCIA)\n\n");
-            verConexoesRaio(headV, headA, headM);
             break;
 
         case 0:

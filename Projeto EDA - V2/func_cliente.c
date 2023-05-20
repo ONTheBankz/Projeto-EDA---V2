@@ -138,7 +138,7 @@ void atualizarBinCliente(FILE** f, cliente* head) {
 }
 
 // Função para fazer login (Cliente)
-void loginCliente(cliente** head, registo** headR) {
+void loginCliente(cliente** head, meio** headM, registo** headR, grafo** headV, aresta** headA) {
     char username[50];
     char password[50];
 
@@ -162,7 +162,7 @@ void loginCliente(cliente** head, registo** headR) {
             system("clear || cls");
             printf("Bem-vindo, %s!\n", curr->nome);
             getchar();
-            showMenuCliente(headR);
+            showMenuCliente(headR, headM, headV, headA);
             if (prev != NULL) {
                 prev->seguinte = curr->seguinte;
                 curr->seguinte = *head;
@@ -754,6 +754,54 @@ void terminarAluguer(int id_cliente) {
     }
 }
 
+// Função para encontrar os meios disponíveis nas localizações encontradas
+void compararNomesVerticesCliente(grafo* g, meio* m, char** nomesVertices, int numVertices, const char* tipo_meio) {
+    // Abrir arquivo em modo de leitura
+    FILE* txt_file = fopen("meios.txt", "r");
+    if (txt_file == NULL) {
+        system("clear || cls");
+        printf("Erro ao abrir arquivo!\n");
+        getchar();
+        exit(1);
+    }
+
+    // Ler todos os meios para uma lista ligada
+    meio* head = NULL;
+    meio* curr = NULL;
+    lerMeios(txt_file, &head);
+    fclose(txt_file);
+
+    printf("\nMeios disponiveis nos locais:\n\n");
+
+    // Verificar se o tipo_meio é "Bicicleta" ou "Trotinete"
+    if (strcmp(tipo_meio, "Bicicleta") != 0 && strcmp(tipo_meio, "Trotinete") != 0) {
+        printf("Tipo de meio inválido! Deve ser 'Bicicleta' ou 'Trotinete'.\n");
+        return;
+    }
+
+    // Percorrer os nomes dos vizinhos encontrados
+    for (int i = 0; i < numVertices; i++) {
+        char* nomeVertice = nomesVertices[i];
+
+        // Percorrer a lista de meios
+        curr = head;
+        while (curr != NULL) {
+            // Comparar o nome do vizinho com o local_grafo do meio e o tipo
+            if (strcmp(nomeVertice, curr->local_grafo) == 0 && strcmp(tipo_meio, curr->tipo) == 0 
+                && curr->reserva == 0) {
+                // Meio encontrado no local vizinho, do tipo desejado e com reserva igual a 0
+                printf("ID: %d\n", curr->id);
+                printf("Tipo: %s\n", curr->tipo);
+                printf("Custo: %.2f\n", curr->custo);
+                printf("Bateria: %.2f\n", curr->bateria);
+                printf("Geocodigo: %s\n", curr->local_grafo);
+                printf("\n");
+            }
+            curr = curr->seguinte;
+        }
+    }
+}
+
 // Função para carregar o saldo do cliente
 void carregarSaldo(int id_cliente) {
     FILE * txt_clientes, * bin_clientes;
@@ -803,7 +851,7 @@ void carregarSaldo(int id_cliente) {
 }
 
 // Menu para clientes
-void showMenuCliente(registo** headR) {
+void showMenuCliente(registo** headR, meio** headM, grafo** headV, aresta** headA) {
    
     int opcao;
     char order_by;
@@ -814,10 +862,11 @@ void showMenuCliente(registo** headR) {
         printf("CLIENTES\n\n");
         printf("Escolha uma opcao:\n");
         printf("1 - Alugar meios transporte\n");
-        printf("2 - Consultar meios diponiveis\n");
-        printf("3 - Consultar alugueres\n");
-        printf("4 - Terminar alugueres\n");
-        printf("5 - Carregar Saldo\n\n");
+        printf("2 - Consultar meios disponiveis\n");
+        printf("3 - Filtrar meios por raio (distancia)\n");
+        printf("4 - Consultar alugueres\n");
+        printf("5 - Terminar alugueres\n");
+        printf("6 - Carregar Saldo\n\n");
         printf("OUTROS\n\n");
         printf("Escolha uma opcao:\n");
         printf("0 - Sair\n");
@@ -827,13 +876,13 @@ void showMenuCliente(registo** headR) {
         switch (opcao) {
         case 1:
             system("clear || cls");
-            printf("\nALUGAR MEIO(S) TRANSPORTE(S)\n\n");
+            printf("\nALUGAR MEIOS TRANSPORTE\n\n");
             registarAluguer(id_cliente, headR);
             break;
 
         case 2:
             system("clear || cls");
-            printf("\CONSULTAR MEIOS\n\n");
+            printf("\CONSULTAR MEIOS DISPONIVEIS\n\n");
             printf("Como deseja ordenar a lista de meios?\n");
             printf("B - Por bateria\n");
             printf("C - por custo\n");
@@ -845,17 +894,23 @@ void showMenuCliente(registo** headR) {
 
         case 3:
             system("clear || cls");
-            printf("\nCONSULTAR ALUGUER(ES)\n\n");
-            listarAluguerCliente(id_cliente);
+            printf("\FILTRAR MEIOS POR RAIO (DISTANCIA)\n\n");
+            verConexoesRaio(headV, headA, headM, 1);
             break;
 
         case 4:
             system("clear || cls");
-            printf("\nTERMINAR ALUGUER\n\n");
-            terminarAluguer(id_cliente);
+            printf("\nCONSULTAR ALUGUERES\n\n");
+            listarAluguerCliente(id_cliente);
             break;
 
         case 5:
+            system("clear || cls");
+            printf("\nTERMINAR ALUGUERES\n\n");
+            terminarAluguer(id_cliente);
+            break;
+
+        case 6:
             system("clear || cls");
             printf("\nCARREGAR SALDO\n\n");
             carregarSaldo(id_cliente);

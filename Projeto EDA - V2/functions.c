@@ -36,7 +36,7 @@ void showMenu(cliente** headC, gestor** headG, meio** headM, registo** headR, gr
         case 3:
             system("clear || cls");
             printf("\nLOGIN DO CLIENTE\n\n");
-            loginCliente(headC, headR);
+            loginCliente(headC, headM, headR, headV, headA);
             break;
 
         case 4:

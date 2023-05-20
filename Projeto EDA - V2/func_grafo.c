@@ -376,7 +376,7 @@ void compararNomesVertices(grafo* g, meio* m, char** nomesVertices, int numVerti
                 printf("Tipo: %s\n", curr->tipo);
                 printf("Custo: %.2f\n", curr->custo);
                 printf("Bateria: %.2f\n", curr->bateria);
-                printf("Local: %s\n", curr->local_grafo);
+                printf("Geocodigo: %s\n", curr->local_grafo);
                 printf("Reserva: %d\n", curr->reserva);
                 printf("\n");
             }
@@ -523,7 +523,7 @@ void atualizarAresta(aresta* a) {
     fclose(arquivo);
 }
 
-void verConexoesRaio(grafo* g, aresta* a, meio* m) {
+void verConexoesRaio(grafo* g, aresta* a, meio* m, int caller) {
     g = carregarGrafo();
     a = carregarAresta();
     imprimirVertices(g);
@@ -543,11 +543,18 @@ void verConexoesRaio(grafo* g, aresta* a, meio* m) {
     scanf("%f", &raio);
 
     printf("\nConexoes dentro do raio de %.2f a partir do ID %d:\n\n", raio, id_origem);
-    encontrarConexoes(g, a, m, id_origem, raio, tipo_meio);
+
+    if (caller == 0) {
+        encontrarConexoes(g, a, m, id_origem, raio, tipo_meio, 0);
+    }
+    else if (caller == 1) {
+        encontrarConexoes(g, a, m, id_origem, raio, tipo_meio, 1);
+    }
+
     getchar();
 }
 
-void encontrarConexoes(grafo* g, aresta* a, meio* m, int id_origem, float raio, const char* tipo_meio) {
+void encontrarConexoes(grafo* g, aresta* a, meio* m, int id_origem, float raio, const char* tipo_meio, int caller) {
     // Criar uma lista ligada para armazenar os vértices visitados
     bool* visitados = calloc(g->num_vertices, sizeof(bool));
     // Criar uma lista ligada para armazenar as distâncias acumuladas
@@ -598,7 +605,14 @@ void encontrarConexoes(grafo* g, aresta* a, meio* m, int id_origem, float raio, 
             }
         }
     }
+
+    if (caller == 0) {
         compararNomesVertices(g, m, nomesVertices, numVertices, tipo_meio);
+    }
+    else if (caller == 1) {
+        compararNomesVerticesCliente(g, m, nomesVertices, numVertices, tipo_meio);
+    }
+
 }
 
 void imprimirConexoes(int origem, int destino, int distancia) {

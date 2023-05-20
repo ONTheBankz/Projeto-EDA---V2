@@ -74,13 +74,14 @@ cliente* lerCliente(FILE* f);
 void lerClientes(FILE* f, cliente** head);
 void atualizarCliente(FILE** f, cliente* head);
 void atualizarBinCliente(FILE** f, cliente* head);
-void loginCliente(cliente** head, registo** headR);
+void loginCliente(cliente** head, meio** headM, registo** headR, grafo** headV, aresta** headA);
 void listarCliente();
 void removerCliente();
 void alterarCliente();
 void listarAluguerCliente(id_cliente);
 void listarMeioCliente(char order_by);
 void terminarAluguer(id_cliente);
+void compararNomesVerticesCliente(grafo* g, meio* m, char** nomesVertices, int numVertices, const char* tipo_meio);
 void carregarSaldo(id_cliente);
 
 // FUNÇÕES GESTOR
@@ -121,8 +122,8 @@ void criarAresta(grafo* g);
 void removerAresta(aresta* a);
 void imprimirAresta(aresta* a);
 void atualizarAresta(aresta* a);
-void verConexoesRaio(grafo* g, aresta* a, meio* m);
-void encontrarConexoes(grafo* g, aresta* a, meio* m, int id_origem, float raio, const char* tipo_meio);
+void verConexoesRaio(grafo* g, aresta* a, meio* m, int caller);
+void encontrarConexoes(grafo* g, aresta* a, meio* m, int id_origem, float raio, const char* tipo_meio, int caller);
 void imprimirConexoes(int origem, int destino, int distancia);
 
 
@@ -137,4 +138,4 @@ void cancelarAluguer();
 // FUNÇÕES MENU
 void showMenu(cliente** headC, gestor** headG, meio** headM, registo** headR, grafo** headV, aresta** headA);
 void showMenuGestor(meio** headM, registo** headR, grafo** headV, aresta** headA);
-void showMenuCliente(registo** headR);
+void showMenuCliente(registo** headR, meio** headM, grafo** headV, aresta** headA);
