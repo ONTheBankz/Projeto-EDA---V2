@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <float.h>
 #include <time.h>
 #include "structs.h"
 
@@ -555,54 +556,82 @@ void verConexoesRaio(grafo* g, aresta* a, meio* m, int caller) {
 }
 
 void encontrarConexoes(grafo* g, aresta* a, meio* m, int id_origem, float raio, const char* tipo_meio, int caller) {
-    // Criar uma lista ligada para armazenar os vértices visitados
     bool* visitados = calloc(g->num_vertices, sizeof(bool));
-    // Criar uma lista ligada para armazenar as distâncias acumuladas
-    int* distanciasAcumuladas = calloc(g->num_vertices, sizeof(int));
-    // Criar uma lista ligada para armazenar os nomes dos vertices
-    char** nomesVertices = calloc(g->num_vertices, sizeof(char*));
+    float* distancias = malloc(g->num_vertices * sizeof(float));
+    int* antecessores = malloc(g->num_vertices * sizeof(int));
+    char** nomesVertices = malloc(g->num_vertices * sizeof(char*));
     int numVertices = 0;
 
-    // Marcar o vértice de origem como visitado e inseri-lo na lista
-    visitados[id_origem] = true;
-    int* fila = malloc(g->num_vertices * sizeof(int));
-    int inicio = 0, fim = 0;
-    fila[fim++] = id_origem;
+    for (int i = 0; i < g->num_vertices; i++) {
+        distancias[i] = FLT_MAX;
+        antecessores[i] = -1;
+    }
 
-    while (inicio != fim) {
-        int verticeAtual = fila[inicio++];
-        vertice* verticeAtualPtr = buscarVertice(g, verticeAtual);
+    distancias[id_origem] = 0.0;
 
-        if (verticeAtualPtr == NULL) {
-            printf("Nao existem conexoes com o ID inserido\n");
-            continue;  // Vértice não encontrado no grafo
+    for (int count = 0; count < g->num_vertices - 1; count++) {
+        int verticeAtual = -1;
+        float menorDistancia = FLT_MAX;
+
+        for (int v = 0; v < g->num_vertices; v++) {
+            if (!visitados[v] && distancias[v] < menorDistancia) {
+                verticeAtual = v;
+                menorDistancia = distancias[v];
+            }
         }
 
+        if (verticeAtual == -1) {
+            break;
+        }
+
+        visitados[verticeAtual] = true;
+
         for (aresta* arestaAtual = a; arestaAtual != NULL; arestaAtual = arestaAtual->proxima) {
-            int idVertice = -1;
+            if (arestaAtual->id_origem == verticeAtual) {
+                int idVizinho = arestaAtual->id_destino;
+                float distanciaAcumulada = distancias[verticeAtual] + arestaAtual->peso;
 
-            if (arestaAtual->id_origem == verticeAtual && !visitados[arestaAtual->id_destino]) {
-                idVertice = arestaAtual->id_destino;
-            }
-            else if (arestaAtual->id_destino == verticeAtual && !visitados[arestaAtual->id_origem]) {
-                idVertice = arestaAtual->id_origem;
-            }
-
-            if (idVertice != -1) {
-                vertice* vizinhoPtr = buscarVertice(g, idVertice);
-
-                if (vizinhoPtr != NULL) {
-                    int distanciaAcumulada = distanciasAcumuladas[verticeAtual] + arestaAtual->peso;
-                    if (distanciaAcumulada <= raio) {
-                        visitados[idVertice] = true;
-                        fila[fim++] = idVertice;
-                        distanciasAcumuladas[idVertice] = distanciaAcumulada;
-                        nomesVertices[numVertices] = obterNomeVertice(g, idVertice);
-                        numVertices++;
-                        imprimirConexoes(verticeAtual, idVertice, distanciaAcumulada);
-                    }
+                if (distanciaAcumulada <= raio && distanciaAcumulada < distancias[idVizinho]) {
+                    distancias[idVizinho] = distanciaAcumulada;
+                    antecessores[idVizinho] = verticeAtual;
                 }
             }
+            else if (arestaAtual->id_destino == verticeAtual) {
+                int idVizinho = arestaAtual->id_origem;
+                float distanciaAcumulada = distancias[verticeAtual] + arestaAtual->peso;
+
+                if (distanciaAcumulada <= raio && distanciaAcumulada < distancias[idVizinho]) {
+                    distancias[idVizinho] = distanciaAcumulada;
+                    antecessores[idVizinho] = verticeAtual;
+                }
+            }
+        }
+    }
+
+    // Armazenar o nome do vértice de origem
+    nomesVertices[numVertices] = obterNomeVertice(g, id_origem);
+    numVertices++;
+
+    for (int i = 0; i < g->num_vertices; i++) {
+        if (i != id_origem && distancias[i] <= raio) {
+            int destino = i;
+
+            // Reconstruir o caminho percorrido
+            int* caminho = malloc(g->num_vertices * sizeof(int));
+            int index = 0;
+            int atual = destino;
+
+            while (atual != -1) {
+                caminho[index++] = atual;
+                atual = antecessores[atual];
+            }
+
+            // Imprimir a conexão
+            imprimirConexao(id_origem, destino, distancias[destino], caminho, index);
+
+            // Armazenar o nome do vértice vizinho
+            nomesVertices[numVertices] = obterNomeVertice(g, i);
+            numVertices++;
         }
     }
 
@@ -612,12 +641,24 @@ void encontrarConexoes(grafo* g, aresta* a, meio* m, int id_origem, float raio, 
     else if (caller == 1) {
         compararNomesVerticesCliente(g, m, nomesVertices, numVertices, tipo_meio);
     }
-
 }
 
-void imprimirConexoes(int origem, int destino, int distancia) {
-    printf("Origem: %d, Destino: %d, Distancia: %d\n", origem, destino, distancia);
+void imprimirCaminho(int* caminho, int tamanho) {
+    printf("Caminho: ");
+    for (int i = tamanho - 1; i >= 0; i--) {
+        printf("%d", caminho[i]);
+        if (i > 0) {
+            printf(" -> ");
+        }
+    }
+    printf("\n\n");
 }
+
+void imprimirConexao(int id_origem, int destino, float distancia, int* caminho, int tamanho) {
+    printf("Origem: %d, Destino: %d, Distancia: %.2f\n", id_origem, destino, distancia);
+    imprimirCaminho(caminho, tamanho);
+}
+
 
 
 

@@ -124,7 +124,8 @@ void imprimirAresta(aresta* a);
 void atualizarAresta(aresta* a);
 void verConexoesRaio(grafo* g, aresta* a, meio* m, int caller);
 void encontrarConexoes(grafo* g, aresta* a, meio* m, int id_origem, float raio, const char* tipo_meio, int caller);
-void imprimirConexoes(int origem, int destino, int distancia);
+void imprimirCaminho(int* caminho, int tamanho);
+void imprimirConexao(int id_origem, int destino, float distancia, int* caminho, int tamanho);
 
 
 // FUNÇÕES ALUGUER
