@@ -1,8 +1,8 @@
-1 Bike Bicicleta 0.50 75.00 rua.das.flores 0
-2 Troti Trotinete 0.30 50.00 rua.das.araras 1
-3 Bike_2 Bicicleta 0.40 65.00 rua.dos.jasmins 0
-4 Troti_2 Trotinete 0.20 0.00 rua.dos.colibris 1
-5 Bike_3 Bicicleta 0.60 25.00 rua.dos.ipes 0
-6 Troti_3 Trotinete 0.40 60.00 rua.dos.sabias 0
-7 Bike_4 Bicicleta 0.30 0.00 rua.dos.lirios 1
-8 Troti_4 Trotinete 0.50 80.00 rua.dos.beija-flores 0
+1 Bike Bicicleta 0.50 75.00 Jardim_St_Barbara ///malas.fixado.facam 0
+2 Troti Trotinete 0.30 50.00 Se_Braga ///provou.evita.irei 0
+3 Bike_2 Bicicleta 0.40 65.00 Monte_Picoto ///supoe.suponha.lenha 0
+4 Troti_2 Trotinete 0.20 40.00 Braga_Parque ///trazem.meteoro.zerado 0
+5 Bike_3 Bicicleta 0.60 25.00 Uni_Minho ///ionico.falou.cidada 0
+6 Troti_3 Trotinete 0.40 60.00 Parque_Rodovia ///panelao.cetim.taxas 0
+7 Bike_4 Bicicleta 0.30 35.00 Hospital ///galao.conterraneos.marte 0
+8 Troti_4 Trotinete 0.50 80.00 Estadio ///tunica.faisca.calo 0

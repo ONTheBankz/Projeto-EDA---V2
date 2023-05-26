@@ -48,19 +48,21 @@ void registarAluguer(int id_cliente, registo** headR) {
     lerMeios(txt_meios, &head_meio);
     fclose(txt_meios);
 
-    // Escrever lista de meios
-    printf("Lista de meios:\n\n");
+    // Mostra a lista de meios
+    printf("ID | Nome      | Tipo      | Custo  | Bateria  | Local              \n");
+    printf("---+-----------+-----------+--------+----------+-------------------+\n");
     curr_meio = head_meio;
     while (curr_meio != NULL) {
         if (curr_meio->reserva != 1) {
-            printf("ID: %d\nNome: %s\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nGeocodigo: %s\n\n", curr_meio->id,
-              curr_meio->nome, curr_meio->tipo, curr_meio->custo, curr_meio->bateria, curr_meio->local_grafo);
+            printf("%-3d| %-10s| %-10s| %-7.2f| %-9.2f| %-18s\n",
+                curr_meio->id, curr_meio->nome, curr_meio->tipo, curr_meio->custo, curr_meio->bateria,
+                curr_meio->local, curr_meio->local_grafo, curr_meio->reserva);
         }
         curr_meio = curr_meio->seguinte;
     }
 
     // Pedir ao user o ID do meio que quer alugar
-    printf("Introduza o ID do meio que pretende alugar: ");
+    printf("\nIntroduza o ID do meio que pretende alugar: ");
     scanf("%d", &meio_id);
 
     // Procurar o meio com o ID escolhido

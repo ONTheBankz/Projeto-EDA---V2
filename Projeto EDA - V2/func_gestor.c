@@ -394,34 +394,37 @@ void registarAluguerGestor(registo** headR) {
     lerClientes(txt_clientes, &head);
     fclose(txt_clientes);
 
-    // Escrever lista de meios
-    printf("Lista de meios:\n\n");
+    // Mostra a lista de meios
+    printf("ID | Nome      | Tipo      | Custo  | Bateria  | Local             | Geocodigo                     \n");
+    printf("---+-----------+-----------+--------+----------+-------------------+------------------------------+\n");
     curr_meio = head_meio;
     while (curr_meio != NULL) {
         if (curr_meio->reserva != 1) {
-            printf("ID: %d\nNome: %s\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nGeocodigo: %s\nReserva: %d\n\n", 
+            printf("%-3d| %-10s| %-10s| %-7.2f| %-9.2f| %-18s| %-29s\n",
                 curr_meio->id, curr_meio->nome, curr_meio->tipo, curr_meio->custo, curr_meio->bateria,
-                curr_meio->local_grafo, curr_meio->reserva);
+                curr_meio->local, curr_meio->local_grafo, curr_meio->reserva);
         }
         curr_meio = curr_meio->seguinte;
     }
 
     // Pedir ao user o ID do meio que quer alugar
-    printf("Introduza o ID do meio que pretende alugar: ");
+    printf("\nIntroduza o ID do meio que pretende alugar: ");
         scanf("%d", &meio_id);
     system("clear || cls");
+    printf("CLIENTES");
+    printf("\n\n");
 
-        // Escrever lista de clientes
-        printf("Lista de clientes:\n\n");
-        curr = head;
-        while (curr != NULL) {
-            printf("ID: %d\nNome: %s\nNIF: %d\nMorada: %s\nSaldo: %.2f\nUtilizador: %s\nPassword: %s\n\n", 
-                curr->id, curr->nome, curr->nif, curr->morada, curr->saldo, curr->utilizador, 
-                curr->password);
-                    curr = curr->seguinte;
-        }
+    // Mostra a lista de clientes
+    printf("ID | Nome      | NIF       | Morada       | Saldo  | Utilizador | Password\n");
+    printf("---+-----------+-----------+--------------+--------+------------+----------\n");
+    curr = head;
+    while (curr != NULL) {
+        printf("%-3d| %-10s| %-9d | %-12s | %-6.2f | %-10s | %-8s\n",
+            curr->id, curr->nome, curr->nif, curr->morada, curr->saldo, curr->utilizador, curr->password);
+        curr = curr->seguinte;
+    }
 
-    printf("Introduza o ID do cliente que pretende efetuar o registo: ");
+    printf("\nIntroduza o ID do cliente que pretende efetuar o registo: ");
         scanf("%d", &id_cliente);
 
     // Procurar o meio com o ID escolhido
@@ -563,17 +566,18 @@ void carregarSaldoGestor() {
     lerClientes(txt_clientes, &head);
     fclose(txt_clientes);
 
-    // Escrever lista de clientes
-    printf("Lista de clientes:\n\n");
+    // Mostra a lista de clientes
+    printf("ID | Nome      | NIF       | Morada       | Saldo  | Utilizador | Password\n");
+    printf("---+-----------+-----------+--------------+--------+------------+----------\n");
     curr = head;
     while (curr != NULL) {
-        printf("ID: %d\nNome: %s\nNIF: %d\nMorada: %s\nSaldo: %.2f\nUtilizador: %s\nPassword: %s\n\n", curr->id,
-            curr->nome, curr->nif, curr->morada, curr->saldo, curr->utilizador, curr->password);
+        printf("%-3d| %-10s| %-9d | %-12s | %-6.2f | %-10s | %-8s\n",
+            curr->id, curr->nome, curr->nif, curr->morada, curr->saldo, curr->utilizador, curr->password);
         curr = curr->seguinte;
     }
 
     // Pedir ao utilizador para introduzir o ID do cliente
-    printf("Digite o ID do cliente: ");
+    printf("\nDigite o ID do cliente: ");
     scanf("%d", &id_cliente);
 
     // Percorrer a lista ligada para encontrar o cliente com o id = id_cliente
@@ -708,12 +712,11 @@ void showMenuGestor(meio** headM, registo** headR, grafo** headV, aresta** headA
         case 9:
             system("clear || cls");
             printf("\nLISTAR MEIO\n\n");
-            printf("Como deseja ordenar a lista de meios?\n");
+            printf("Como deseja ordenar a lista de meios?\n\n");
             printf("B - Por bateria\n");
-            printf("C - por custo\n");
+            printf("C - por custo\n\n");
             printf("Opcao: ");
             scanf(" %c", &order_by);
-            printf("\n\n");
             listarMeio(order_by);
             break;
 
@@ -732,7 +735,7 @@ void showMenuGestor(meio** headM, registo** headR, grafo** headV, aresta** headA
         case 12:
             system("clear || cls");
             printf("\nALTERAR DADOS MEIO\n\n");
-            alterarMeio();
+            alterarMeio(headV);
             break;
         
         case 13:
@@ -779,7 +782,7 @@ void showMenuGestor(meio** headM, registo** headR, grafo** headV, aresta** headA
 
         case 20:
             system("clear || cls");
-            printf("\REMOVER CONEXAO\n\n");
+            printf("\REMOVER CONEXAO\n");
             removerAresta(headA);
             break;
 

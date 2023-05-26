@@ -14,20 +14,32 @@ grafo* criarGrafo() {
     g->vertices = NULL;
 
     char nomes[8][50] = {
-        "rua.das.flores",
-        "rua.das.araras",
-        "rua.dos.jasmins",
-        "rua.dos.colibris",
-        "rua.dos.ipes",
-        "rua.dos.sabias",
-        "rua.dos.lirios",
-        "rua.dos.beija-flores"
+        "///malas.fixado.facam",
+        "///provou.evita.irei",
+        "///supoe.suponha.lenha",
+        "///trazem.meteoro.zerado",
+        "///ionico.falou.cidada",
+        "///panelao.cetim.taxas",
+        "///galao.conterraneos.marte",
+        "///tunica.faisca.calo"
+    };
+
+    char local_meios[8][50] = {
+      "Jardim_St_Barbara",
+      "Se_Braga",
+      "Monte_Picoto",
+      "Braga_Parque",
+      "Uni_Minho",
+      "Parque_Rodovia",
+      "Hospital",
+      "Estadio"
     };
 
     for (int i = 0; i < g->num_vertices; i++) {
         vertice* novoVertice = (vertice*)malloc(sizeof(vertice));
         novoVertice->id = i;
         strcpy(novoVertice->nome, nomes[i]);
+        strcpy(novoVertice->local_meio, local_meios[i]);
         novoVertice->arestas = NULL;
         novoVertice->seguinte = NULL;
 
@@ -59,12 +71,15 @@ grafo* carregarGrafo() {
     }
 
     char linha[100];
+
     while (fgets(linha, sizeof(linha), arquivo) != NULL) {
         int id;
+        char local_meio[50];
         char nome[50];
-        if (sscanf(linha, "ID: %d, Nome: %[^\n]", &id, nome) == 2) {
+        if (sscanf(linha, "%d %s %s\n", &id, local_meio, nome) == 3) {
             vertice* novoVertice = (vertice*)malloc(sizeof(vertice));
             novoVertice->id = id;
+            strcpy(novoVertice->local_meio, local_meio);
             strcpy(novoVertice->nome, nome);
             novoVertice->arestas = NULL;
             novoVertice->seguinte = NULL;
@@ -90,19 +105,19 @@ grafo* carregarGrafo() {
 }
 
 aresta* carregarAresta() {
-    // Open the file in read mode
+    // Abre o ficheiro em modo leitura
     FILE* arquivo = fopen("arestas.txt", "r");
     if (arquivo == NULL) {
         printf("Erro: Falha ao abrir o arquivo.\n");
         return NULL;
     }
 
-    aresta* lista_arestas = NULL;  // Linked list to store the edges
+    aresta* lista_arestas = NULL;  // Lista ligada para guardar as arestas
 
-    // Read the values from the file and create edges
+    // Lê os valores do ficheiro e cria as arestas
     int id_origem, id_destino, peso;
     while (fscanf(arquivo, "%d %d %d", &id_origem, &id_destino, &peso) == 3) {
-        // Create a new edge
+        // Cria uma nova aresta
         aresta* nova_aresta = (aresta*)malloc(sizeof(aresta));
         if (nova_aresta == NULL) {
             printf("Erro: Falha ao alocar memoria para a nova aresta.\n");
@@ -114,7 +129,7 @@ aresta* carregarAresta() {
         nova_aresta->peso = peso;
         nova_aresta->proxima = NULL;
 
-        // Add the edge to the linked list
+        // Adiciona a aresta à lista ligada
         if (lista_arestas == NULL) {
             lista_arestas = nova_aresta;
         }
@@ -127,7 +142,7 @@ aresta* carregarAresta() {
         }
     }
 
-    // Close the file
+    // Fecha o ficheiro
     fclose(arquivo);
 
     return lista_arestas;
@@ -154,7 +169,7 @@ void salvarGrafo(grafo* g) {
 
     vertice* atual = g->vertices;
     while (atual != NULL) {
-        fprintf(arquivo, "ID: %d, Nome: %s\n", atual->id, atual->nome);
+        fprintf(arquivo, "%d %s %s\n", atual->id, atual->local_meio, atual->nome);
         atual = atual->seguinte;
     }
 
@@ -163,15 +178,20 @@ void salvarGrafo(grafo* g) {
 
 void criarVertice(grafo* g) {
     char nome[50];
+    char local_meio[50];
     g = carregarGrafo();
     // Solicitar o nome do vértice ao usuário
-    printf("Digite o nome do vertice: ");
+    printf("Digite o geocodigo do vertice: ");
     scanf("%s", nome);
+
+    printf("\nDigite o local do vertice: ");
+    scanf("%s", local_meio);
 
     // Criar um novo vértice
     vertice* novoVertice = (vertice*)malloc(sizeof(vertice));
     novoVertice->id = g->num_vertices;
     strcpy(novoVertice->nome, nome);
+    strcpy(novoVertice->local_meio, local_meio);
     novoVertice->arestas = NULL;
     novoVertice->seguinte = NULL;
 
@@ -196,7 +216,7 @@ void criarVertice(grafo* g) {
         return;
     }
 
-    fprintf(arquivo, "ID: %d, Nome: %s\n", novoVertice->id, novoVertice->nome);
+    fprintf(arquivo, "ID: %d, Local: %s, Nome: %s\n", novoVertice->id, novoVertice->local_meio, novoVertice->nome);
 
     fclose(arquivo);
 
@@ -208,6 +228,7 @@ void editarVertice(grafo* g) {
     g = carregarGrafo();
     int id;
     char novoNome[50];
+    char novoLocal[50];
 
     imprimirVertices(g);
 
@@ -229,12 +250,19 @@ void editarVertice(grafo* g) {
         return;
     }
 
-    // Solicitar o novo nome do vértice ao usuário
-    printf("\nDigite o novo nome do vertice: ");
+    // Solicitar o novo geocodigo do vértice ao usuário
+    printf("\nDigite o novo geocodigo do vertice: ");
     scanf("%s", novoNome);
 
-    // Atualizar o nome do vértice
+    // Atualizar o geocodigo do vértice
     strcpy(atual->nome, novoNome);
+
+    // Solicitar o novo local do vértice ao usuário
+    printf("\nDigite o novo local do vertice: ");
+    scanf("%s", novoLocal);
+
+    // Atualizar o local do vértice
+    strcpy(atual->local_meio, novoLocal);
 
     // Atualizar o arquivo "grafo.txt" com os novos valores
     FILE* arquivo = fopen("grafo.txt", "w");
@@ -244,14 +272,15 @@ void editarVertice(grafo* g) {
     }
 
     // Escrever os vértices atualizados no arquivo
-    vertice* temp = g->vertices;
-    while (temp != NULL) {
-        fprintf(arquivo, "ID: %d, Nome: %s\n", temp->id, temp->nome);
-        temp = temp->seguinte;
+    vertice* novoVertice = g->vertices;
+    while (novoVertice != NULL) {
+        fprintf(arquivo, "%d %s %s\n", novoVertice->id, novoVertice->local_meio, novoVertice->nome);
+        novoVertice = novoVertice->seguinte;
     }
 
     fclose(arquivo);
 
+    system("clear || cls");
     printf("\nVertice editado com sucesso!\n");
     getchar();
 }
@@ -303,25 +332,27 @@ void removerVertice(grafo* g) {
     }
 
     // Escrever os vértices atualizados no arquivo
-    vertice* temp = g->vertices;
-    while (temp != NULL) {
-        fprintf(arquivo, "ID: %d, Nome: %s\n", temp->id, temp->nome);
-        temp = temp->seguinte;
+    vertice* novoVertice = g->vertices;
+    while (novoVertice != NULL) {
+        fprintf(arquivo, "%d %s %s\n", novoVertice->id, novoVertice->local_meio, novoVertice->nome);
+        novoVertice = novoVertice->seguinte;
     }
 
     fclose(arquivo);
 
+    system("clear || cls");
     printf("\nVertice removido com sucesso!\n");
     getchar();
 }
 
 void imprimirVertices(grafo* g) {
-    g = carregarGrafo();
     printf("Localizacoes:\n\n");
-    // Mostra a lista de vértices
-    vertice* v = (g)->vertices;
+    printf("%-5s | %-17s | %s\n", "ID", "Local", "Nome");
+    printf("----------------------------------\n");
+
+    vertice* v = g->vertices;
     while (v != NULL) {
-        printf("ID: %d | Nome: %s\n", v->id, v->nome);
+        printf("%-5d | %-17s | %s\n", v->id, v->local_meio, v->nome);
         v = v->seguinte;
     }
 }
@@ -377,7 +408,7 @@ void compararNomesVertices(grafo* g, meio* m, char** nomesVertices, int numVerti
                 printf("Tipo: %s\n", curr->tipo);
                 printf("Custo: %.2f\n", curr->custo);
                 printf("Bateria: %.2f\n", curr->bateria);
-                printf("Geocodigo: %s\n", curr->local_grafo);
+                printf("Local: %s\n", curr->local);
                 printf("Reserva: %d\n", curr->reserva);
                 printf("\n");
             }
@@ -466,10 +497,10 @@ void removerAresta(aresta* a) {
     aresta* anterior = NULL;
     aresta* atual = a;
 
-    // Traverse the linked list to find the edge to be removed
+    // Atravessa a lista para encontrar a aresta a ser removida
     while (atual != NULL) {
         if (atual->id_origem == id_origem && atual->id_destino == id_destino) {
-            // Edge found, remove it from the linked list
+            // Aresta encontrada, remove-a da lista 
             if (anterior == NULL) {
                 a = atual->proxima;
             }
@@ -477,11 +508,11 @@ void removerAresta(aresta* a) {
                 anterior->proxima = atual->proxima;
             }
 
-            // Free the memory occupied by the edge
+            // Liberta a memória ocupada pela aresta
             free(atual);
             printf("\Conexao removida com sucesso.\n");
             getchar();
-            // Update the file
+            // Atualiza o ficheiro
             atualizarAresta(a);
 
             return;
@@ -506,21 +537,21 @@ void imprimirAresta(aresta* a) {
 }
 
 void atualizarAresta(aresta* a) {
-    // Open the file in write mode (this will clear its contents)
+    // Abre o ficheiro em modo escrita
     FILE* arquivo = fopen("arestas.txt", "w");
     if (arquivo == NULL) {
         printf("Erro: Falha ao abrir o arquivo.\n");
         return;
     }
 
-    // Write the edges from the linked list to the file
+    // Escreve as arestas da lista no ficheiro
     aresta* atual = a;
     while (atual != NULL) {
         fprintf(arquivo, "%d %d %d\n", atual->id_origem, atual->id_destino, atual->peso);
         atual = atual->proxima;
     }
 
-    // Close the file
+    // Fecha o ficheiro
     fclose(arquivo);
 }
 
@@ -531,16 +562,25 @@ void verConexoesRaio(grafo* g, aresta* a, meio* m, int caller) {
 
     int id_origem;
     float raio;
+    int tipo_opcao;
     char tipo_meio[50];
 
     printf("\nDigite o ID onde se encontra: ");
     scanf("%d", &id_origem);
 
-    printf("Digite o tipo de meio (Bicicleta ou Trotinete): ");
- 
-    scanf("%s", tipo_meio);
+    printf("\nDigite o tipo de meio:\n\n");
+    printf("1. Bicicleta\n");
+    printf("2. Trotinete\n\n");
+    scanf("%d", &tipo_opcao);
 
-    printf("Digite o raio de distancia: ");
+    if (tipo_opcao == 1) {
+        strcpy(tipo_meio, "Bicicleta");
+    }
+    else if (tipo_opcao == 2) {
+        strcpy(tipo_meio, "Trotinete");
+    }
+  
+    printf("\nDigite o raio de distancia: ");
     scanf("%f", &raio);
 
     printf("\nConexoes dentro do raio de %.2f a partir do ID %d:\n\n", raio, id_origem);
@@ -612,6 +652,10 @@ void encontrarConexoes(grafo* g, aresta* a, meio* m, int id_origem, float raio, 
     nomesVertices[numVertices] = obterNomeVertice(g, id_origem);
     numVertices++;
 
+    printf("+----------+---------+-----------+-------------------+\n");
+    printf("| Origem   | Destino | Distancia |       Caminho     |\n");
+    printf("+----------+---------+-----------+-------------------+\n");
+
     for (int i = 0; i < g->num_vertices; i++) {
         if (i != id_origem && distancias[i] <= raio) {
             int destino = i;
@@ -643,21 +687,19 @@ void encontrarConexoes(grafo* g, aresta* a, meio* m, int id_origem, float raio, 
     }
 }
 
-void imprimirCaminho(int* caminho, int tamanho) {
-    printf("Caminho: ");
+void imprimirConexao(int id_origem, int destino, float distancia, int* caminho, int tamanho) {
+
+    printf("| %8d | %7d | %9.2f | ", id_origem, destino, distancia);
+    
     for (int i = tamanho - 1; i >= 0; i--) {
         printf("%d", caminho[i]);
         if (i > 0) {
             printf(" -> ");
         }
     }
-    printf("\n\n");
-}
-
-void imprimirConexao(int id_origem, int destino, float distancia, int* caminho, int tamanho) {
-    printf("Origem: %d, Destino: %d, Distancia: %.2f\n", id_origem, destino, distancia);
-    imprimirCaminho(caminho, tamanho);
-}
+        printf("\n");
+        printf("+----------+---------+-----------+-------------------+\n");
+    }
 
 
 

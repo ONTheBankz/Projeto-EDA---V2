@@ -31,6 +31,7 @@ typedef struct meio {
     float bateria;
     char nome[50];
     char tipo[50];
+    char local[50];
     char local_grafo[50];
     struct meio* seguinte;
 } meio;
@@ -57,6 +58,7 @@ typedef struct aresta {
 typedef struct vertice {
     int id;
     char nome[50];
+    char local_meio[50];
     meio* meios;
     aresta* arestas; 
     struct vertice* seguinte;
@@ -104,7 +106,7 @@ void lerMeios(FILE* f, meio** head);
 void atualizarMeio(FILE** f, meio* head_meio);
 void atualizarBinMeio(FILE** f, meio* head_meio);
 void removerMeio();
-void alterarMeio();
+void alterarMeio(grafo** g);
 
 // FUNÇÕES GRAFO
 grafo* criarGrafo();
@@ -124,7 +126,6 @@ void imprimirAresta(aresta* a);
 void atualizarAresta(aresta* a);
 void verConexoesRaio(grafo* g, aresta* a, meio* m, int caller);
 void encontrarConexoes(grafo* g, aresta* a, meio* m, int id_origem, float raio, const char* tipo_meio, int caller);
-void imprimirCaminho(int* caminho, int tamanho);
 void imprimirConexao(int id_origem, int destino, float distancia, int* caminho, int tamanho);
 
 

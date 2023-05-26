@@ -20,12 +20,12 @@ void registarMeio(meio** head, grafo** g) {
     int id = 0;
     int id_vert;
     int reserva;
-    char nome[50], tipo[50], distancia[50], local_grafo[50];
+    char nome[50], tipo[50], distancia[50], local[50], local_grafo[50];
     float custo, bateria;
 
     // Encontrar o último ID presente no ficheiro e incrementá-lo
-    while (fscanf(f, "%d %s %s %f %f %s %d\n", &id, nome, tipo, &custo, &bateria,
-        local_grafo, &reserva) != EOF) {
+    while (fscanf(f, "%d %s %s %f %f %s %s %d\n", &id, nome, tipo, &custo, &bateria,
+        local, local_grafo, &reserva) != EOF) {
 
     }
 
@@ -35,10 +35,23 @@ void registarMeio(meio** head, grafo** g) {
     // Preencher os campos do novo meio
     novo_meio->id = id;
     novo_meio->reserva = 0;
-    printf("Digite o tipo do meio: ");
-    scanf("%s", novo_meio->tipo);
+    printf("Digite o tipo do meio:\n\n");
+    printf("1. Trotiente\n");
+    printf("2. Bicicleta\n\n");
+    int opcao;
+    scanf("%d", &opcao);
 
-    printf("Digite o nome do meio: ");
+    if (opcao == 1) {
+        strcpy(novo_meio->tipo, "Trotiente");
+    }
+    else if (opcao == 2) {
+        strcpy(novo_meio->tipo, "Bicicleta");
+    }
+    else {
+        printf("Opcao invalida. O tipo do meio sera definido como vazio.\n");
+        strcpy(novo_meio->tipo, "");
+    }
+    printf("\nDigite o nome do meio: ");
     scanf("%s", novo_meio->nome);
 
     printf("Digite o custo do meio: ");
@@ -59,6 +72,7 @@ void registarMeio(meio** head, grafo** g) {
     v = (*g)->vertices;
     while (v != NULL) {
         if (v->id == id_vert) {
+            strcpy(novo_meio->local, v->local_meio);
             strcpy(novo_meio->local_grafo, v->nome);
             break;
         }
@@ -76,8 +90,8 @@ void registarMeio(meio** head, grafo** g) {
         exit(1);
     }
 
-    fprintf(f, "%d %s %s %.2f %.2f %s %d\n", novo_meio->id, novo_meio->nome, novo_meio->tipo, novo_meio->custo,
-        novo_meio->bateria, novo_meio->local_grafo, novo_meio->reserva);
+    fprintf(f, "%d %s %s %.2f %.2f %s %s %d\n", novo_meio->id, novo_meio->nome, novo_meio->tipo, novo_meio->custo,
+        novo_meio->bateria, novo_meio->local, novo_meio->local_grafo, novo_meio->reserva);
 
     fclose(f);
 
@@ -92,7 +106,7 @@ void registarMeio(meio** head, grafo** g) {
     fclose(bin_meio);
 
     system("clear || cls");
-    printf("Meio registrado com sucesso!\n");
+    printf("Meio registado com sucesso!\n");
     getchar();
 }
 
@@ -101,8 +115,8 @@ void lerMeios(FILE* f, meio** head) {
     meio* current = NULL;
     while (!feof(f)) {
         meio* new_meio = (meio*)malloc(sizeof(meio));
-        fscanf(f, "%d %s %s %f %f %s %d\n", &(new_meio->id), new_meio->nome, new_meio->tipo, &(new_meio->custo),
-               &(new_meio->bateria), new_meio->local_grafo, &(new_meio->reserva));
+        fscanf(f, "%d %s %s %f %f %s %s %d\n", &(new_meio->id), new_meio->nome, new_meio->tipo, &(new_meio->custo),
+               &(new_meio->bateria), new_meio->local, new_meio->local_grafo, &(new_meio->reserva));
         new_meio->seguinte = NULL;
         if (*head == NULL) {
             *head = new_meio;
@@ -123,8 +137,8 @@ void atualizarMeio(FILE** f, meio* head_meio) {
 
     // Escreve os conteúdos de cada categoria
     while (curr_meio != NULL) {
-        fprintf(*f, "%d %s %s %.2f %.2f %s %d\n", curr_meio->id, curr_meio->nome, curr_meio->tipo, curr_meio->custo,
-            curr_meio->bateria, curr_meio->local_grafo, curr_meio->reserva);
+        fprintf(*f, "%d %s %s %.2f %.2f %s %s %d\n", curr_meio->id, curr_meio->nome, curr_meio->tipo, curr_meio->custo,
+            curr_meio->bateria, curr_meio->local, curr_meio->local_grafo, curr_meio->reserva);
         curr_meio = curr_meio->seguinte;
     }
 
@@ -161,8 +175,8 @@ void listarMeio(char order_by) {
     // Cria o array de meios
     meio m[100];
     int count = 0;
-    while (fscanf(txt_meio, "%d %s %s %f %f %s %d\n", &m[count].id, m[count].nome, m[count].tipo, &m[count].custo,
-        &m[count].bateria, m[count].local_grafo, &m[count].reserva) != EOF) {
+    while (fscanf(txt_meio, "%d %s %s %f %f %s %s %d\n", &m[count].id, m[count].nome, m[count].tipo, &m[count].custo,
+        &m[count].bateria, m[count].local, m[count].local_grafo, &m[count].reserva) != EOF) {
         count++;
     }
 
@@ -180,7 +194,7 @@ void listarMeio(char order_by) {
                 }
             }
         }
-        printf("Lista de meios ordenada por bateria:\n\n");
+        printf("\nLista de meios ordenada por bateria:\n\n");
     }
     else if (order_by == 'c') {
         // Ordena por custo
@@ -193,17 +207,18 @@ void listarMeio(char order_by) {
                 }
             }
         }
-        printf("Lista de meios ordenada por custo:\n\n");
+        printf("\nLista de meios ordenada por custo:\n\n");
     }
     else {
         printf("Opcao de ordenacao invalida.\n");
         return;
     }
-
     // Mostra a lista de meios
+    printf("ID | Nome      | Tipo      | Custo  | Bateria  | Local             | Geocodigo                    | Reserva\n");
+    printf("---+-----------+-----------+--------+----------+-------------------+------------------------------+---------\n");
     for (int i = 0; i < count; i++) {
-        printf("ID: %d\nNome: %s\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nGeocodigo: %s\nReserva: %d\n\n",
-            m[i].id, m[i].nome, m[i].tipo, m[i].custo, m[i].bateria, m[i].local_grafo, m[i].reserva);
+        printf("%-3d| %-10s| %-10s| %-7.2f| %-9.2f| %-18s| %-29s| %-6d\n",
+            m[i].id, m[i].nome, m[i].tipo, m[i].custo, m[i].bateria, m[i].local, m[i].local_grafo, m[i].reserva);
     }
     getchar();
 }
@@ -228,18 +243,18 @@ void removerMeio() {
         lerMeios(txt_file, &head);
         fclose(txt_file);
 
-        // Escrever lista de meios
-        printf("Lista de meios:\n\n");
+        // Mostra a lista de meios
+        printf("ID | Nome      | Tipo      | Custo  | Bateria  | Local             | Geocodigo                    | Reserva\n");
+        printf("---+-----------+-----------+--------+----------+-------------------+------------------------------+---------\n");
         curr = head;
         while (curr != NULL) {
-        printf("ID: %d\nNome: %s\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nGeocodigo: %s\nReserva: %d\n\n", 
-                curr->id, curr->nome, curr->tipo, curr->custo, curr->bateria, curr->local_grafo,
-                curr->reserva);
-                curr = curr->seguinte;
+            printf("%-3d| %-10s| %-10s| %-7.2f| %-9.2f| %-18s| %-29s| %-6d\n",
+                curr->id, curr->nome, curr->tipo, curr->custo, curr->bateria, curr->local, curr->local_grafo, curr->reserva);
+            curr = curr->seguinte;
         }
-
+    
         // Pedir ao user o ID do meio a remover
-        printf("Digite o ID do meio a remover: ");
+        printf("\nDigite o ID do meio a remover: ");
         scanf("%d", &id);
 
         // Procurar o meio com o ID escolhido
@@ -278,9 +293,10 @@ void removerMeio() {
     }
 
 // Função para alterar um meio
-void alterarMeio() {
+void alterarMeio(grafo** g) {
+    *g = carregarGrafo();
     int id;
-
+    int id_vert;
     // Abrir ficheiro em modo leitura
     FILE* file = fopen("meios.txt", "r");
     FILE* bin_file = fopen("meios.bin", "ab+");
@@ -297,18 +313,18 @@ void alterarMeio() {
     lerMeios(file, &head);
     fclose(file);
 
-    // Escrever lista de meios
-    printf("Lista de meios:\n\n");
+    // Mostra a lista de meios
+    printf("ID | Nome      | Tipo      | Custo  | Bateria  | Local             | Geocodigo                    | Reserva\n");
+    printf("---+-----------+-----------+--------+----------+-------------------+------------------------------+---------\n");
     curr = head;
     while (curr != NULL) {
-    printf("ID: %d\nNome: %s\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nGeocodigo: %s\nReserva: %d\n\n", 
-            curr->id, curr->nome, curr->tipo, curr->custo, curr->bateria, curr->local_grafo,
-            curr->reserva);
-            curr = curr->seguinte;
+        printf("%-3d| %-10s| %-10s| %-7.2f| %-9.2f| %-18s| %-29s| %-6d\n",
+            curr->id, curr->nome, curr->tipo, curr->custo, curr->bateria, curr->local, curr->local_grafo, curr->reserva);
+        curr = curr->seguinte;
     }
 
     // Pedir ao user o ID do meio a alterar
-    printf("Digite o ID do meio a alterar: ");
+    printf("\nDigite o ID do meio a alterar: ");
     scanf("%d", &id);
 
     // Procurar o meio com o ID escolhido
@@ -328,30 +344,63 @@ void alterarMeio() {
         // Alterar o meio com o ID escolhido
         char campo[20], novo_valor[50];
         do {
-            printf("Digite o campo a alterar (nome, tipo, custo, bateria, geocodigo ou reserva), ou 'fim' para terminar: ");
+            printf("\nDigite o campo a alterar (nome, tipo, custo, bateria, local, geocodigo ou reserva), ou 'fim' para terminar: ");
             scanf("%s", campo);
             if (strcmp(campo, "fim") == 0) {
                 break;
             }
-            printf("Digite o novo valor: ");
-            scanf("%s", novo_valor);
-            if (strcmp(campo, "nome") == 0) {
-                strcpy(curr->nome, novo_valor);
+            if (strcmp(campo, "local") == 0 || strcmp(campo, "geocodigo") == 0) {
+                printf("\n");
+                // Mostra a lista de vértices e pede ao usuário o ID
+                vertice* v = (*g)->vertices;
+                imprimirVertices(*g);
+                printf("\nDigite o ID correspondente a localizacao do meio: ");
+                scanf("%d", &id_vert);
+              
+                // Encontra o vértice com o ID escolhido e copia o respetivo nome
+                v = (*g)->vertices;
+                while (v != NULL) {
+                    if (v->id == id_vert) {
+                        strcpy(curr->local, v->local_meio);
+                        strcpy(curr->local_grafo, v->nome);
+                        break;
+                    }
+                    v = v->seguinte;
+                }
             }
             else if (strcmp(campo, "tipo") == 0) {
-                strcpy(curr->tipo, novo_valor);
+                printf("\nDigite o novo tipo de meio:\n\n");
+                printf("1. Bicicleta\n");
+                printf("2. Trotinete\n\n");
+                int tipo_opcao;
+                scanf("%d", &tipo_opcao);
+
+                if (tipo_opcao == 1) {
+                    strcpy(curr->tipo, "Bicicleta");
+                }
+                else if (tipo_opcao == 2) {
+                    strcpy(curr->tipo, "Trotinete");
+                }
+                else {
+                    printf("\nOpcao invalida. O campo nao sera alterado.\n");
+                }
             }
-            else if (strcmp(campo, "custo") == 0) {
-                curr->custo = atof(novo_valor);
-            }
-            else if (strcmp(campo, "bateria") == 0) {
-                curr->bateria = atof(novo_valor);
-            }           
-            else if (strcmp(campo, "geocodigo") == 0) {
-                strcpy(curr->local_grafo, novo_valor);
-            }
-            else if (strcmp(campo, "reserva") == 0) {
-                curr->reserva = atoi(novo_valor);
+            else {
+                printf("\nDigite o novo valor: ");
+                scanf("%s", novo_valor);
+
+                if (strcmp(campo, "nome") == 0) {
+                    strcpy(curr->nome, novo_valor);
+                }           
+                else if (strcmp(campo, "custo") == 0) {
+                    curr->custo = atof(novo_valor);
+                }
+                else if (strcmp(campo, "bateria") == 0) {
+                    curr->bateria = atof(novo_valor);
+                }
+                else if (strcmp(campo, "reserva") == 0) {
+                    curr->reserva = atoi(novo_valor);
+                }
             }
 
         } while (strcmp(campo, "fim") != 0);

@@ -192,10 +192,13 @@ void listarCliente() {
 
     // Mostra a lista de clientes
     printf("Lista de clientes:\n\n");
+    printf("ID   | Nome        | NIF        | Morada          | Saldo   | Utilizador   | Password\n");
+    printf("-----+-------------+------------+-----------------+---------+--------------+----------\n");
+
     cliente c;
-    while (fscanf(file, "%d %s %d %s %f %s %s\n", &c.id, c.nome, &c.nif, c.morada, &c.saldo, 
+    while (fscanf(file, "%d %s %d %s %f %s %s\n", &c.id, c.nome, &c.nif, c.morada, &c.saldo,
         c.utilizador, c.password) != EOF) {
-        printf("ID: %d\nNome: %s\nNIF: %d\nMorada: %s\nSaldo: %.2f\nUtilizador: %s\nPassword: %s\n\n", 
+        printf("%-5d| %-12s| %-11d| %-16s| %-8.2f| %-13s| %-8s\n",
             c.id, c.nome, c.nif, c.morada, c.saldo, c.utilizador, c.password);
     }
 
@@ -223,18 +226,18 @@ void removerCliente() {
     lerClientes(txt_file, &head);
     fclose(txt_file);
 
-    // Escrever lista de clientes
-    printf("Lista de clientes:\n\n");
+    // Mostra a lista de clientes
+    printf("ID | Nome      | NIF       | Morada       | Saldo  | Utilizador | Password\n");
+    printf("---+-----------+-----------+--------------+--------+------------+----------\n");
     curr = head;
     while (curr != NULL) {
-        printf("ID: %d\nNome: %s\nNIF: %d\nMorada: %s\nSaldo: %.2f\nUtilizador: %s\nPassword: %s\n\n", 
-            curr->id, curr->nome, curr->nif, curr->morada, curr->saldo, curr->utilizador, 
-            curr->password);
-            curr = curr->seguinte;
+        printf("%-3d| %-10s| %-9d | %-12s | %-6.2f | %-10s | %-8s\n",
+            curr->id, curr->nome, curr->nif, curr->morada, curr->saldo, curr->utilizador, curr->password);
+        curr = curr->seguinte;
     }
 
     // Pedir ao user o ID do cliente a remover
-    printf("Digite o ID do cliente a remover: ");
+    printf("\nDigite o ID do cliente a remover: ");
     scanf("%d", &id);
 
     // Procurar o cliente com o ID escolhido
@@ -292,18 +295,18 @@ void alterarCliente() {
     lerClientes(file, &head);
     fclose(file);
 
-    // Escrever lista de clientes
-    printf("Lista de clientes:\n\n");
+    // Mostra a lista de clientes
+    printf("ID | Nome      | NIF       | Morada       | Saldo  | Utilizador | Password\n");
+    printf("---+-----------+-----------+--------------+--------+------------+----------\n");
     curr = head;
     while (curr != NULL) {
-        printf("ID: %d\nNome: %s\nNIF: %d\nMorada: %s\nSaldo: %.2f\nUtilizador: %s\nPassword: %s\n\n", 
-            curr->id, curr->nome, curr->nif, curr->morada, curr->saldo, curr->utilizador, 
-            curr->password);
-            curr = curr->seguinte;
+        printf("%-3d| %-10s| %-9d | %-12s | %-6.2f | %-10s | %-8s\n",
+            curr->id, curr->nome, curr->nif, curr->morada, curr->saldo, curr->utilizador, curr->password);
+        curr = curr->seguinte;
     }
 
     // Pedir ao user o ID do cliente a alterar
-    printf("Digite o ID do cliente a alterar: ");
+    printf("\nDigite o ID do cliente a alterar: ");
     scanf("%d", &id);
 
     // Procurar o cliente com o ID escolhido
@@ -497,8 +500,8 @@ void listarMeioCliente(char order_by) {
     // Cria um array de meios
     meio m[100];
     int count = 0;
-    while (fscanf(txt_meio, "%d %s %s %f %f %s %d\n", &m[count].id, m[count].nome, m[count].tipo, &m[count].custo,
-        &m[count].bateria, m[count].local_grafo, &m[count].reserva) != EOF) {
+    while (fscanf(txt_meio, "%d %s %s %f %f %s %s %d\n", &m[count].id, m[count].nome, m[count].tipo, &m[count].custo,
+        &m[count].bateria, m[count].local, m[count].local_grafo, &m[count].reserva) != EOF) {
         count++;
     }
 
@@ -516,7 +519,7 @@ void listarMeioCliente(char order_by) {
                 }
             }
         }
-        printf("Lista de meios ordenada por bateria:\n\n");
+        printf("\nLista de meios ordenada por bateria:\n\n");
     }
     else if (order_by == 'c') {
         // Ordena por custo
@@ -529,18 +532,20 @@ void listarMeioCliente(char order_by) {
                 }
             }
         }
-        printf("Lista de meios ordenada por custo:\n\n");
+        printf("\nLista de meios ordenada por custo:\n\n");
     }
     else {
         printf("Opcao de ordenacao invalida.\n");
         return;
     }
 
-    // Mostra os meios com o campo reserva = 0
+    // Mostra a lista de meios
+    printf("ID | Nome      | Tipo      | Custo  | Bateria  | Local              \n");
+    printf("---+-----------+-----------+--------+----------+-------------------+\n");
     for (int i = 0; i < count; i++) {
         if (m[i].reserva == 0) {
-            printf("ID: %d\nNome: %s\nTipo: %s\nCusto: %.2f\nBateria: %.2f\nGeocodigo: %s\n\n",
-                m[i].id, m[i].nome, m[i].tipo, m[i].custo, m[i].bateria, m[i].local_grafo);
+            printf("%-3d| %-10s| %-10s| %-7.2f| %-9.2f| %-18s\n",
+                m[i].id, m[i].nome, m[i].tipo, m[i].custo, m[i].bateria, m[i].local);
         }
     }
     getchar();
@@ -682,8 +687,8 @@ void terminarAluguer(int id_cliente) {
             }
             // Atualizar o campo "reserva" para 0
             curr_meio->reserva = 0;
-            // Retira 10% da bateria por minuto passado
-            bateria_decrementa = minutos_diferenca * 10;
+            // Retira 5% da bateria por minuto passado
+            bateria_decrementa = minutos_diferenca * 5;
             curr_meio->bateria -= bateria_decrementa;
 
             // Verifica se a bateria chega ao fim
@@ -794,7 +799,7 @@ void compararNomesVerticesCliente(grafo* g, meio* m, char** nomesVertices, int n
                 printf("Tipo: %s\n", curr->tipo);
                 printf("Custo: %.2f\n", curr->custo);
                 printf("Bateria: %.2f\n", curr->bateria);
-                printf("Geocodigo: %s\n", curr->local_grafo);
+                printf("Local: %s\n", curr->local);
                 printf("\n");
             }
             curr = curr->seguinte;
@@ -883,12 +888,11 @@ void showMenuCliente(registo** headR, meio** headM, grafo** headV, aresta** head
         case 2:
             system("clear || cls");
             printf("\CONSULTAR MEIOS DISPONIVEIS\n\n");
-            printf("Como deseja ordenar a lista de meios?\n");
+            printf("Como deseja ordenar a lista de meios?\n\n");
             printf("B - Por bateria\n");
-            printf("C - por custo\n");
+            printf("C - por custo\n\n");
             printf("Opcao: ");
             scanf(" %c", &order_by);
-            printf("\n\n");
             listarMeioCliente(order_by);
             break;
 
