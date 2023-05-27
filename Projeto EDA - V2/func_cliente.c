@@ -678,6 +678,7 @@ void mostrarMeiosCliente(grafo* g, meio* m, char** nomesVertices, int numVertice
     fclose(txt_file);
 
     printf("\nMeios disponiveis nos locais:\n\n");
+    printf("ID | Nome      | Tipo      | Custo  | Bateria  | Local             \n");
 
     // Verificar se o tipo_meio é "Bicicleta" ou "Trotinete"
     if (strcmp(tipo_meio, "Bicicleta") != 0 && strcmp(tipo_meio, "Trotinete") != 0) {
@@ -695,15 +696,12 @@ void mostrarMeiosCliente(grafo* g, meio* m, char** nomesVertices, int numVertice
             // Comparar o nome do vizinho com o local_grafo do meio e o tipo
             if (strcmp(nomeVertice, curr->local_grafo) == 0 && strcmp(tipo_meio, curr->tipo) == 0 
                 && curr->reserva == 0) {
-                // Meio encontrado no local vizinho, do tipo desejado e com reserva igual a 0
-                printf("ID: %d\n", curr->id);
-                printf("Tipo: %s\n", curr->tipo);
-                printf("Custo: %.2f\n", curr->custo);
-                printf("Bateria: %.2f\n", curr->bateria);
-                printf("Local: %s\n", curr->local);
-                printf("\n");
+                // Meio encontrado no local vizinho e do tipo desejado, imprimir informações
+                printf("---+-----------+-----------+--------+----------+-------------------+\n");
+                printf("%-3d| %-10s| %-10s| %-7.2f| %-9.2f| %-18s\n",
+                    curr->id, curr->nome, curr->tipo, curr->custo, curr->bateria, curr->local, curr->reserva);
             }
-            curr = curr->seguinte;
+                curr = curr->seguinte;  // Move to the next meio
         }
     }
 }

@@ -58,6 +58,49 @@ grafo* criarGrafo() {
     return g;
 }
 
+aresta* criarConexao() {
+    aresta* listaArestas = NULL;
+    int conexoes[12][3] = {
+        {0, 1, 13},
+        {0, 2, 15},
+        {1, 2, 17},
+        {1, 4, 23},
+        {2, 3, 19},
+        {2, 6, 28},
+        {3, 4, 13},
+        {3, 5, 15},
+        {4, 5, 17},
+        {4, 7, 28},
+        {5, 6, 19},
+        {6, 7, 15}
+    };
+        for (int i = 0; i < 12; i++) {
+            int id_origem = conexoes[i][0];
+            int id_destino = conexoes[i][1];
+            int peso = conexoes[i][2];
+
+            aresta* novaAresta = (aresta*)malloc(sizeof(aresta));
+            novaAresta->id_origem = id_origem;
+            novaAresta->id_destino = id_destino;
+            novaAresta->peso = peso;
+            novaAresta->proxima = NULL;
+
+        // Adiciona a nova aresta à lista de arestas
+        if (listaArestas == NULL) {
+            listaArestas = novaAresta;
+        }
+        else {
+            aresta* atual = listaArestas;
+            while (atual->proxima != NULL) {
+                atual = atual->proxima;
+            }
+            atual->proxima = novaAresta;
+        }
+    }
+
+    return listaArestas;
+}
+
 grafo* carregarGrafo() {
     grafo* g = (grafo*)malloc(sizeof(grafo));
     g->num_vertices = 0;
@@ -113,8 +156,8 @@ aresta* carregarAresta() {
     }
         aresta* lista_arestas = NULL;  // Lista ligada para guardar as arestas
     // Lê os valores do ficheiro e cria as arestas
-    int id_origem, id_destino, peso;
-    while (fscanf(arquivo, "%d %d %d", &id_origem, &id_destino, &peso) == 3) {
+        int id_origem, id_destino, peso;
+        while (fscanf(arquivo, "%d %d %d", &id_origem, &id_destino, &peso) == 3) {
     // Cria uma nova aresta
         aresta* nova_aresta = (aresta*)malloc(sizeof(aresta));
             if (nova_aresta == NULL) {
@@ -173,8 +216,7 @@ void salvarGrafo(grafo* g) {
     fclose(arquivo_bin);
 }
 
-void criarVertice(grafo* g) {
-    
+void criarVertice(grafo* g) {  
     char nome[50];
     char local_meio[50];
     g = carregarGrafo();
@@ -357,6 +399,7 @@ void mostrarMeios(grafo* g, meio* m, char** nomesVertices, int numVertices, cons
     fclose(txt_file);
 
     printf("\nMeios disponiveis nos locais:\n\n");
+    printf("ID | Nome      | Tipo      | Custo  | Bateria  | Local             | Reserva\n");
 
     // Verificar se o tipo_meio é "Bicicleta" ou "Trotinete"
     if (strcmp(tipo_meio, "Bicicleta") != 0 && strcmp(tipo_meio, "Trotinete") != 0) {
@@ -374,22 +417,18 @@ void mostrarMeios(grafo* g, meio* m, char** nomesVertices, int numVertices, cons
             // Comparar o nome do vizinho com o local_grafo do meio e o tipo
             if (strcmp(nomeVertice, curr->local_grafo) == 0 && strcmp(tipo_meio, curr->tipo) == 0) {
                 // Meio encontrado no local vizinho e do tipo desejado, imprimir informações
-                printf("ID: %d\n", curr->id);
-                printf("Tipo: %s\n", curr->tipo);
-                printf("Custo: %.2f\n", curr->custo);
-                printf("Bateria: %.2f\n", curr->bateria);
-                printf("Local: %s\n", curr->local);
-                printf("Reserva: %d\n", curr->reserva);
-                printf("\n");
+                printf("---+-----------+-----------+--------+----------+-------------------+---------+\n");
+                printf("%-3d| %-10s| %-10s| %-7.2f| %-9.2f| %-18s| %-6d\n",
+                    curr->id, curr->nome, curr->tipo, curr->custo, curr->bateria, curr->local, curr->reserva);
             }
-            curr = curr->seguinte;
+                curr = curr->seguinte;  // Move to the next meio
         }
     }
 }
 
 void criarAresta(grafo* g) {
-    g = carregarGrafo();
     int id_origem, id_destino, peso;
+    g = carregarGrafo();
     imprimirVertices(g);
 
     // Obter as entradas do usuário
@@ -431,7 +470,9 @@ void criarAresta(grafo* g) {
 
     // Abrir o arquivo em modo de append
     FILE* arquivo = fopen("arestas.txt", "a");
-    if (arquivo == NULL) {
+    FILE* arquivo_bin = fopen("arestas.bin", "ab");
+
+    if (arquivo == NULL || arquivo_bin == NULL) {
         printf("Erro: Falha ao abrir o arquivo.\n");
         free(nova_aresta);
         return;
@@ -439,12 +480,39 @@ void criarAresta(grafo* g) {
 
     // Escrever a aresta no arquivo
     fprintf(arquivo, "%d %d %d\n", nova_aresta->id_origem, nova_aresta->id_destino, nova_aresta->peso);
+    fwrite(nova_aresta, sizeof(aresta), 1, arquivo_bin);
 
     // Fechar o arquivo
     fclose(arquivo);
+    fclose(arquivo_bin);
 
     printf("\nConexao das localizacoes criada com sucesso!\n");
     getchar();
+}
+
+void salvarAresta(aresta* a) {
+    // Salvar em arquivo de texto (.txt)
+    FILE* arquivoTxt = fopen("arestas.txt", "w");
+    FILE* arquivoBin = fopen("arestas.bin", "wb");
+    if (arquivoTxt == NULL || arquivoBin == NULL) {
+        printf("Erro ao abrir o arquivo para escrita.\n");
+        return;
+    }
+    aresta* atualTxt = a;
+    while (atualTxt != NULL) {
+        fprintf(arquivoTxt, "%d %d %d\n", atualTxt->id_origem, atualTxt->id_destino, atualTxt->peso);
+        atualTxt = atualTxt->proxima;
+    }
+
+    aresta* atualBin = a;
+    while (atualBin != NULL) {
+        fwrite(&atualBin->id_origem, sizeof(int), 1, arquivoBin);
+        fwrite(&atualBin->id_destino, sizeof(int), 1, arquivoBin);
+        fwrite(&atualBin->peso, sizeof(int), 1, arquivoBin);
+        atualBin = atualBin->proxima;
+    }
+    fclose(arquivoTxt);
+    fclose(arquivoBin);
 }
 
 void removerAresta(aresta* a) {
@@ -458,10 +526,10 @@ void removerAresta(aresta* a) {
     imprimirAresta(a);
 
     int id_origem, id_destino;
-    printf("\nDigite o ID da localizacao de origem da conexao a ser removida: ");
+    printf("\nDigite o ID da localizacao de origem: ");
     scanf("%d", &id_origem);
 
-    printf("\nDigite o ID da localizacao de destino da conexao a ser removida: ");
+    printf("\nDigite o ID da localizacao de destino: ");
     scanf("%d", &id_destino);
 
     aresta* anterior = NULL;
@@ -480,7 +548,7 @@ void removerAresta(aresta* a) {
 
             // Liberta a memória ocupada pela aresta
             free(atual);
-            printf("\Conexao removida com sucesso.\n");
+            printf("\nConexao removida com sucesso.\n");
             getchar();
 
             // Atualiza o ficheiro
@@ -506,9 +574,11 @@ void imprimirAresta(aresta* a) {
 }
 
 void atualizarAresta(aresta* a) {
-    // Abre o ficheiro em modo escrita
+    // Abrir o arquivo em modo de escrita
     FILE* arquivo = fopen("arestas.txt", "w");
-    if (arquivo == NULL) {
+    FILE* arquivo_bin = fopen("arestas.bin", "wb");
+
+    if (arquivo == NULL || arquivo_bin == NULL) {
         printf("Erro: Falha ao abrir o arquivo.\n");
         return;
     }
@@ -517,11 +587,13 @@ void atualizarAresta(aresta* a) {
     aresta* atual = a;
     while (atual != NULL) {
         fprintf(arquivo, "%d %d %d\n", atual->id_origem, atual->id_destino, atual->peso);
+        fwrite(atual, sizeof(aresta), 1, arquivo_bin);
         atual = atual->proxima;
     }
 
     // Fecha o ficheiro
     fclose(arquivo);
+    fclose(arquivo_bin);
 }
 
 void verConexoesRaio(grafo* g, aresta* a, meio* m, int caller) {

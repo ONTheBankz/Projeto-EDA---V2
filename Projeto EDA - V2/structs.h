@@ -110,6 +110,7 @@ void alterarMeio(grafo** g);
 
 // FUNÇÕES GRAFO
 grafo* criarGrafo();
+aresta* criarConexao();
 grafo* carregarGrafo();
 aresta* carregarAresta();
 vertice* buscarVertice(grafo* g, int id);
@@ -122,6 +123,7 @@ void atualizarVertices(vertice* vertices);
 char* obterNomeVertice(grafo* g, int id_vertice);
 void mostrarMeios(grafo* g, meio* m, char** nomesVertices, int numVertices, const char* tipo_meio);
 void criarAresta(grafo* g);
+void salvarAresta(aresta* a);
 void removerAresta(aresta* a);
 void imprimirAresta(aresta* a);
 void atualizarAresta(aresta* a);
@@ -139,6 +141,7 @@ void listarAluguer();
 void cancelarAluguer();
 
 // FUNÇÕES MENU
+int fileExiste(const char* filename);
 void showMenu(cliente** headC, gestor** headG, meio** headM, registo** headR, grafo** headV, aresta** headA);
 void showMenuGestor(meio** headM, registo** headR, grafo** headV, aresta** headA);
 void showMenuCliente(registo** headR, meio** headM, grafo** headV, aresta** headA);
