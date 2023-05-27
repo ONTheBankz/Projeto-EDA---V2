@@ -68,6 +68,12 @@ gestor* lerGestor(FILE* f) {
 
 // Função para passar os gestores para uma lista ligada
 void lerGestores(FILE* f, gestor** head) {
+    f = fopen("gestores.txt", "r");
+    if (f == NULL) {
+        printf("Erro ao abrir arquivo!\n");
+        getchar();
+        exit(1);
+    }
     gestor* current = NULL;
     while (!feof(f)) {
         gestor* new_gestor = (gestor*)malloc(sizeof(gestor));
@@ -87,7 +93,7 @@ void lerGestores(FILE* f, gestor** head) {
 // Função para atualizar os gestores no ficheiro
 void atualizarGestor(FILE** f, gestor* head) {
     // Abre o ficheiro para atualizar os valores
-    *f = fopen("gestores.txt", "wb");
+    *f = fopen("gestores.txt", "w");
     gestor* curr = head;
 
     // Escreve os conteúdos de cada categoria
@@ -162,19 +168,19 @@ void loginGestor(gestor** head, meio** headM, registo** headR, grafo** headV, ar
 // Função para listar um gestor
 void listarGestor() {
     int id;
-// Abre o ficheiro em modo read
+    // Abre o ficheiro em modo read
     FILE* file = fopen("gestores.txt", "r");
     if (file == NULL) {
     printf("Erro ao abrir arquivo!\n");
     exit(1);
-}
+    }
 
-// Mostra a lista de gestores
+    // Mostra a lista de gestores
     printf("Lista de gestores:\n\n");
     gestor g;
     while (fscanf(file, "%d %s %s %s\n", &g.id, g.nome, g.utilizador, g.password) != EOF) {
     printf("ID: %d\nNome: %s\nUtilizador: %s\nPassword: %s\n\n", g.id, g.nome, g.utilizador, g.password);
-}
+    }
 
     fclose(file);
     getchar();
@@ -187,45 +193,39 @@ void removerGestor() {
     // Abrir ficheiros em modo de escrita e leitura
     FILE* txt_file = fopen("gestores.txt", "r");
     FILE* bin_file = fopen("gestores.bin", "ab+");
-    if (txt_file == NULL || bin_file == NULL) {
-        system("clear || cls");
-        printf("Erro ao abrir arquivo!\n");
-        getchar();
-        exit(1);
-    }
-
+   
     // Ler todos os gestores para uma lista ligada
     gestor* head = NULL;
     gestor* curr = NULL;
     lerGestores(txt_file, &head);
     fclose(txt_file);
 
-    // Escrever lista de gestores
-    printf("Lista de gestores:\n\n");
-    curr = head;
-    while (curr != NULL) {
-        printf("ID: %d\nNome: %s\nUtilizador: %s\nPassword: %s\n\n", curr->id, curr->nome, curr->utilizador, curr->password);
-        curr = curr->seguinte;
-    }
+        // Escrever lista de gestores
+        printf("Lista de gestores:\n\n");
+        curr = head;
+        while (curr != NULL) {
+            printf("ID: %d\nNome: %s\nUtilizador: %s\nPassword: %s\n\n", curr->id, curr->nome, curr->utilizador, curr->password);
+               curr = curr->seguinte;
+        }
 
-    // Pedir ao user o ID do gestor a remover
-    printf("Digite o ID do gestor a remover: ");
-    scanf("%d", &id);
+        // Pedir ao user o ID do gestor a remover
+        printf("Digite o ID do gestor a remover: ");
+        scanf("%d", &id);
 
-    // Procurar o gestor com o ID escolhido
-    curr = head;
-    gestor* prev = NULL;
-    while (curr != NULL && curr->id != id) {
-        prev = curr;
-        curr = curr->seguinte;
-    }
+        // Procurar o gestor com o ID escolhido
+        curr = head;
+        gestor* prev = NULL;
+        while (curr != NULL && curr->id != id) {
+            prev = curr;
+            curr = curr->seguinte;
+        }
 
-    if (curr == NULL) {
-        system("clear || cls");
-        printf("Gestor com ID %d nao encontrado!\n", id);
-        getchar();
-    }
-    else {
+        if (curr == NULL) {
+            system("clear || cls");
+            printf("Gestor com ID %d nao encontrado!\n", id);
+            getchar();
+        }
+        else {
         // Remover o gestor da lista ligada
         if (prev == NULL) {
             head = curr->seguinte;
@@ -233,18 +233,19 @@ void removerGestor() {
         else {
             prev->seguinte = curr->seguinte;
         }
+
         free(curr);
 
         // atualizar os gestores no ficheiro
         atualizarGestor(&txt_file, head);
 
         // atualizar os gestores no binário
-        atualizarBinGestor(&txt_file, head);
+        atualizarBinGestor(&bin_file, head);
 
-        system("clear || cls");
-        printf("Gestor com ID %d removido com sucesso!\n", id);
-        getchar();
-    }
+            system("clear || cls");
+            printf("Gestor com ID %d removido com sucesso!\n", id);
+            getchar();
+        }
 }
 
 // Função para alterar um gestor
@@ -254,13 +255,7 @@ void alterarGestor() {
     // Abrir ficheiro em modo leitura
     FILE* file = fopen("gestores.txt", "r");
     FILE* bin_file = fopen("gestores.bin", "ab+");
-    if (file == NULL || bin_file == NULL) {
-        system("clear || cls");
-        printf("Erro ao abrir arquivo!\n");
-        getchar();
-        exit(1);
-    }
-
+ 
     // Ler todos os gestores para uma lista ligada
     gestor* head = NULL;
     gestor* curr = NULL;
@@ -319,19 +314,12 @@ void alterarGestor() {
         atualizarGestor(&file, head);
 
         // atualizar os gestores no binário
-        atualizarBinGestor(&file, head);
+        atualizarBinGestor(&bin_file, head);
 
         system("clear || cls");
         printf("Gestor com ID %d alterado com sucesso!\n", id);
         getchar();
 
-        // Libertar a memória alocada para a lista ligada
-        curr = head;
-        while (curr != NULL) {
-            gestor* temp = curr;
-            curr = curr->seguinte;
-            free(temp);
-        }
     }
 }
 
@@ -365,13 +353,7 @@ void registarAluguerGestor(registo** headR) {
     // Abrir ficheiros em modo de escrita e leitura
     txt_meios = fopen("meios.txt", "r");
     bin_meios = fopen("meios.bin", "ab+");
-    if (txt_meios == NULL || bin_meios == NULL) {
-        system("clear || cls");
-        printf("Erro ao abrir arquivo!\n");
-        getchar();
-        exit(1);
-    }
-
+    
     // Ler todos os meios para uma lista ligada
     meio* head_meio = NULL;
     meio* curr_meio = NULL;
@@ -381,12 +363,6 @@ void registarAluguerGestor(registo** headR) {
     // Abrir ficheiros em modo de escrita e leitura
     txt_clientes = fopen("clientes.txt", "r");
     bin_clientes = fopen("clientes.bin", "ab+");
-    if (txt_clientes == NULL || bin_clientes == NULL) {
-        system("clear || cls");
-        printf("Erro ao abrir arquivo!\n");
-        getchar();
-        exit(1);
-    }
 
     // Ler todos os clientes para uma lista ligada
     cliente* head = NULL;
@@ -448,7 +424,7 @@ void registarAluguerGestor(registo** headR) {
     atualizarMeio(&txt_meios, head_meio);
 
     // atualizar os meios no binário
-    atualizarBinMeio(&txt_meios, head_meio);
+    atualizarBinMeio(&bin_meios, head_meio);
 
     // Procurar o cliente com o ID escolhido
     curr = head;
@@ -460,7 +436,7 @@ void registarAluguerGestor(registo** headR) {
     atualizarCliente(&txt_clientes, head);
 
     // atualizar os clientes no binário
-    atualizarBinCliente(&txt_clientes, head);
+    atualizarBinCliente(&bin_clientes, head);
 
     // Alocar memória para um novo registo
     registo* new_registo = (registo*)malloc(sizeof(registo));
@@ -486,7 +462,7 @@ void registarAluguerGestor(registo** headR) {
         id_registo = 1;
     }
     else {
-        id_registo++;
+            id_registo++;
         // Ficheiro não está vazio, incrementa ao valor anterior
         while (fscanf(txt_registos, "%*d %*d %*d %*d/%*d/%*d %*d:%*d\n") != EOF) {
             id_registo++;
@@ -553,13 +529,7 @@ void carregarSaldoGestor() {
 
     // Abrir ficheiros em modo de leitura
     txt_clientes = fopen("clientes.txt", "r");
-    if (txt_clientes == NULL) {
-        system("clear || cls");
-        printf("Erro ao abrir arquivo!\n");
-        getchar();
-        exit(1);
-    }
-
+ 
     // Ler todos os clientes para uma lista ligada
     cliente* head = NULL;
     cliente* curr = NULL;
@@ -605,15 +575,8 @@ void carregarSaldoGestor() {
     atualizarCliente(&txt_clientes, head);
 
     // atualizar os clientes no binário
-    atualizarBinCliente(&txt_clientes, head);
+    atualizarBinCliente(&bin_clientes, head);
 
-    // Libertar memória alocada para as listas ligadas
-    curr = head;
-    while (curr != NULL) {
-        cliente* temp = curr;
-        curr = curr->seguinte;
-        free(temp);
-    }
 }
 
 // Menu Gestor

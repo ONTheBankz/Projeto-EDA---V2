@@ -35,12 +35,6 @@ void registarAluguer(int id_cliente, registo** headR) {
     // Abrir ficheiros em modo de escrita e leitura
     txt_meios = fopen("meios.txt", "r");
     bin_meios = fopen("meios.bin", "ab+");
-    if (txt_meios == NULL || bin_meios == NULL) {
-        system("clear || cls");
-        printf("Erro ao abrir arquivo!\n");
-        getchar();
-        exit(1);
-    }
 
     // Ler todos os meios para uma lista ligada
     meio* head_meio = NULL;
@@ -86,17 +80,11 @@ void registarAluguer(int id_cliente, registo** headR) {
     atualizarMeio(&txt_meios, head_meio);
 
     // atualizar os meios no binário
-    atualizarBinMeio(&txt_meios, head_meio);
+    atualizarBinMeio(&bin_meios, head_meio);
 
     // Abrir ficheiros em modo de escrita e leitura
     txt_clientes = fopen("clientes.txt", "r");
     bin_clientes = fopen("clientes.bin", "ab+");
-    if (txt_clientes == NULL || bin_clientes == NULL) {
-        system("clear || cls");
-        printf("Erro ao abrir arquivo!\n");
-        getchar();
-        exit(1);
-    }
 
     // Ler todos os clientes para uma lista ligada
     cliente* head = NULL;
@@ -114,7 +102,7 @@ void registarAluguer(int id_cliente, registo** headR) {
    atualizarCliente(&txt_clientes, head);
 
    // atualizar os clientes no binário
-   atualizarBinCliente(&txt_clientes, head);
+   atualizarBinCliente(&bin_clientes, head);
 
     // Alocar memória para um novo registo
     registo* new_registo = (registo*)malloc(sizeof(registo));
@@ -183,7 +171,6 @@ void registarAluguer(int id_cliente, registo** headR) {
         getchar();
         exit(1);
     }
-
     // Escrever os valores do registo no ficheiro de texto
     fprintf(txt_historico, "%d %d %d %d/%d/%d %d:%d\n", new_registo->id, new_registo->cliente_id, 
         new_registo->meio_id, new_registo->dia, new_registo->mes, new_registo->ano, new_registo->horas, 
@@ -201,13 +188,20 @@ void registarAluguer(int id_cliente, registo** headR) {
 
 // Função para passar os registos para uma lista ligada
 void lerAluguer(FILE* f, registo** head) {
+    f = fopen("registos.txt", "r");
+    if (f == NULL) {
+        printf("Erro ao abrir arquivo!\n");
+        getchar();
+        exit(1);
+    }
     registo* current = NULL;
     while (!feof(f)) {
         registo* new_registo = (registo*)malloc(sizeof(registo));
         int result = fscanf(f, "%d %d %d %d/%d/%d %d:%d\n", &(new_registo->id), &(new_registo->cliente_id), 
             &(new_registo->meio_id), &(new_registo->dia), &(new_registo->mes), &(new_registo->ano), 
             &(new_registo->horas), &(new_registo->minutos));
-        new_registo->seguinte = NULL;
+              new_registo->seguinte = NULL;
+        
         if (result != 8) {
             free(new_registo);
             break;
@@ -221,16 +215,16 @@ void lerAluguer(FILE* f, registo** head) {
             current = new_registo;
         }
     }
-    if (*head == NULL) {
-        system("clear || cls");
-        printf("Nao existem registos de aluguer disponiveis.\n");
-    }
+        if (*head == NULL) {
+            system("clear || cls");
+            printf("Nao existem registos de aluguer disponiveis.\n");
+        }
 }
 
 // Função para atualizar os registos no ficheiro
 void atualizarAluguer(FILE** f, registo* head_registo) {
     // Abre o ficheiro para atualizar os valores
-    *f = fopen("registos.txt", "wb");
+    *f = fopen("registos.txt", "w");
     registo* curr_registo = head_registo;
 
     // Escreve os conteúdos de cada categoria
@@ -251,12 +245,11 @@ void atualizarBinAluguer(FILE** f, registo* head_registo) {
         getchar();
         exit(1);
     }
-
-    registo* curr_registo = head_registo;
-    while (curr_registo != NULL) {
-        fwrite(curr_registo, sizeof(registo), 1, f);
-        curr_registo = curr_registo->seguinte;
-    }
+        registo* curr_registo = head_registo;
+        while (curr_registo != NULL) {
+            fwrite(curr_registo, sizeof(registo), 1, f);
+            curr_registo = curr_registo->seguinte;
+        }
 
     fclose(f);
 }
@@ -273,13 +266,6 @@ void listarAluguer() {
     // Abrir ficheiros em modo de leitura
     txt_meios = fopen("meios.txt", "r");
 
-    if (txt_meios == NULL) {
-        system("clear || cls");
-        printf("Erro ao abrir arquivo!\n");
-        getchar();
-        exit(1);
-    }
-
     // Ler todos os meios para uma lista ligada
     meio* head_meio = NULL;
     meio* curr_meio = NULL;
@@ -288,12 +274,6 @@ void listarAluguer() {
 
     // Abrir ficheiros em modo de leitura
     txt_clientes = fopen("clientes.txt", "r");
-    if (txt_clientes == NULL) {
-        system("clear || cls");
-        printf("Erro ao abrir arquivo!\n");
-        getchar();
-        exit(1);
-    }
 
     // Ler todos os clientes para uma lista ligada
     cliente* head = NULL;
@@ -301,14 +281,8 @@ void listarAluguer() {
     lerClientes(txt_clientes, &head);
     fclose(txt_clientes);
 
-    // Abrir ficheiros em modo de escrita e leitura
-    txt_registos = fopen("registos.txt", "ab+");
-    if (txt_registos == NULL) {
-        system("clear || cls");
-        printf("Erro ao abrir arquivo!\n");
-        getchar();
-        exit(1);
-    }
+    // Abrir ficheiros em modo de leitura
+    txt_registos = fopen("registos.txt", "r");
 
     // Ler todos os registos para uma lista ligada
     registo* head_registo = NULL;
@@ -344,29 +318,7 @@ void listarAluguer() {
             curr_registo->dia, curr_registo->mes, curr_registo->ano, curr_registo->horas, curr_registo->minutos);
         curr_registo = curr_registo->seguinte;
     }
-
-    // Libertar memória alocada para as listas ligadas
-    curr = head;
-    while (curr != NULL) {
-        cliente* temp = curr;
-        curr = curr->seguinte;
-        free(temp);
-    }
-
-    curr_meio = head_meio;
-    while (curr_meio != NULL) {
-        meio* temp = curr_meio;
-        curr_meio = curr_meio->seguinte;
-        free(temp);
-    }
-
-    curr_registo = head_registo;
-    while (curr_registo != NULL) {
-        registo* temp = curr_registo;
-        curr_registo = curr_registo->seguinte;
-        free(temp);
-    }
-    getchar();
+        getchar();
 }
 
 // Função para cancelar um aluguer de um determinado cliente
@@ -381,13 +333,6 @@ void cancelarAluguer() {
     // Abrir ficheiros em modo de leitura
     txt_meios = fopen("meios.txt", "r");
 
-    if (txt_meios == NULL) {
-        system("clear || cls");
-        printf("Erro ao abrir arquivo!\n");
-        getchar();
-        exit(1);
-    }
-
     // Ler todos os meios para uma lista ligada
     meio* head_meio = NULL;
     meio* curr_meio = NULL;
@@ -396,12 +341,6 @@ void cancelarAluguer() {
 
     // Abrir ficheiros em modo de leitura
     txt_clientes = fopen("clientes.txt", "r");
-    if (txt_clientes == NULL) {
-        system("clear || cls");
-        printf("Erro ao abrir arquivo!\n");
-        getchar();
-        exit(1);
-    }
 
     // Ler todos os clientes para uma lista ligada
     cliente* head = NULL;
@@ -409,14 +348,8 @@ void cancelarAluguer() {
     lerClientes(txt_clientes, &head);
     fclose(txt_clientes);
 
-    // Abrir ficheiros em modo de escrita e leitura
-    txt_registos = fopen("registos.txt", "ab+");
-    if (txt_registos == NULL) {
-        system("clear || cls");
-        printf("Erro ao abrir arquivo!\n");
-        getchar();
-        exit(1);
-    }
+    // Abrir ficheiros em modo de leitura
+    txt_registos = fopen("registos.txt", "r");
 
     // Ler todos os registos para uma lista ligada
     registo* head_registo = NULL;
@@ -472,16 +405,13 @@ void cancelarAluguer() {
                 }
                 curr_meio = curr_meio->seguinte;
             }
-
             // Encontrar o cliente com o ID associado ao registo
             curr = head;
             while (curr != NULL) {
                 curr = curr->seguinte;
             }
-
             // Atualizar o campo "reserva" para 0
             curr_meio->reserva = 0;
-
             // Remover o registo da lista
             if (prev_registo == NULL) {
                 head_registo = curr_registo->seguinte;
@@ -510,39 +440,17 @@ void cancelarAluguer() {
     }
 
     // atualizar os registos no binário
-    atualizarBinAluguer(&txt_registos, head_registo);
+    atualizarBinAluguer(&bin_registos, head_registo);
 
     // atualizar os meios no binário
-    atualizarBinMeio(&txt_meios, head_meio);
+    atualizarBinMeio(&bin_meios, head_meio);
 
     // atualizar os clientes no binário
-    atualizarBinCliente(&txt_clientes, head);
+    atualizarBinCliente(&bin_clientes, head);
 
     system("clear || cls");
     printf("Aluguer nao encontrado.\n");
     getchar();
-
-    // Libertar memória alocada para as listas ligadas
-    curr_registo = head_registo;
-    while (curr_registo != NULL) {
-        registo* temp = curr_registo;
-        curr_registo = curr_registo->seguinte;
-        free(temp);
-    }
-
-    curr_meio = head_meio;
-    while (curr_meio != NULL) {
-        meio* temp = curr_meio;
-        curr_meio = curr_meio->seguinte;
-        free(temp);
-    }
-
-    curr = head;
-    while (curr != NULL) {
-        cliente* temp = curr;
-        curr = curr->seguinte;
-        free(temp);
-    }
 }
 
 

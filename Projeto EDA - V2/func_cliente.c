@@ -13,16 +13,14 @@ void registarCliente(cliente** head) {
     // Alocar memória para um novo cliente
     cliente* new_cliente = (cliente*)malloc(sizeof(cliente));
 
-    // Abrir o ficheiro de clientes para leitura em modo append
-    FILE* f_txt = fopen("clientes.txt", "a+");
-    if (f_txt == NULL) {
-        printf("Erro ao abrir o ficheiro clientes.txt\n");
-        return;
-    }
+    // Abrir ficheiros em modo de escrita e leitura
+    FILE* f_txt = fopen("clientes.txt", "a");
     FILE* f_bin = fopen("clientes.bin", "ab");
-    if (f_bin == NULL) {
-        printf("Erro ao abrir o ficheiro clientes.bin\n");
-        return;
+    if (f_txt == NULL || f_bin == NULL) {
+        system("clear || cls");
+        printf("Erro ao abrir arquivo!\n");
+        getchar();
+        exit(1);
     }
 
     int id = 0;
@@ -85,13 +83,20 @@ cliente* lerCliente(FILE* f) {
 
 // Função para passar os clientes para uma lista ligada
 void lerClientes(FILE* f, cliente** head) {
+    f = fopen("clientes.txt", "r");
+    if (f == NULL) {
+        printf("Erro ao abrir arquivo!\n");
+        getchar();
+        exit(1);
+    }
     cliente* current = NULL;
     while (!feof(f)) {
         cliente* new_cliente = (cliente*)malloc(sizeof(cliente));
         fscanf(f, "%d %s %d %s %f %s %s\n", &(new_cliente->id), new_cliente->nome,
-            &(new_cliente->nif), new_cliente->morada, &(new_cliente->saldo), 
-            new_cliente->utilizador, new_cliente->password);
-        new_cliente->seguinte = NULL;
+               &(new_cliente->nif), new_cliente->morada, &(new_cliente->saldo), 
+                 new_cliente->utilizador, new_cliente->password);
+                 new_cliente->seguinte = NULL;
+
         if (*head == NULL) {
             *head = new_cliente;
             current = new_cliente;
@@ -106,7 +111,7 @@ void lerClientes(FILE* f, cliente** head) {
 // Função para atualizar os clientes no ficheiro
 void atualizarCliente(FILE** f, cliente* head) {
     // Abre o ficheiro para atualizar os valores
-    *f = fopen("clientes.txt", "wb");
+    *f = fopen("clientes.txt", "w");
     cliente* curr = head;
 
     // Escreve os conteúdos de cada categoria
@@ -181,8 +186,9 @@ void loginCliente(cliente** head, meio** headM, registo** headR, grafo** headV, 
 }
 
 // Função para listar um cliente
-void listarCliente() {
+void listarCliente() { 
     int id;
+    
     // Abre o ficheiro em modo read
     FILE* file = fopen("clientes.txt", "r");
     if (file == NULL) {
@@ -213,12 +219,6 @@ void removerCliente() {
     // Abrir ficheiros em modo de escrita e leitura
     FILE* txt_file = fopen("clientes.txt", "r");
     FILE* bin_file = fopen("clientes.bin", "ab+");
-    if (txt_file == NULL || bin_file == NULL) {
-        system("clear || cls");
-        printf("Erro ao abrir arquivo!\n");
-        getchar();
-        exit(1);
-    }
 
     // Ler todos os clientes para uma lista ligada
     cliente* head = NULL;
@@ -267,10 +267,10 @@ void removerCliente() {
         atualizarCliente(&txt_file, head);
 
         // atualizar os clientes no binário
-        atualizarBinCliente(&txt_file, head);
+        atualizarBinCliente(&bin_file, head);
 
         system("clear || cls");
-        printf("Gestor com ID %d removido com sucesso!\n", id);
+        printf("Cliente com ID %d removido com sucesso!\n", id);
         getchar();
     }
 }
@@ -282,13 +282,7 @@ void alterarCliente() {
     // Abrir ficheiro em modo leitura
     FILE* file = fopen("clientes.txt", "r");
     FILE* bin_file = fopen("clientes.bin", "ab+");
-    if (file == NULL || bin_file == NULL) {
-        system("clear || cls");
-        printf("Erro ao abrir arquivo!\n");
-        getchar();
-        exit(1);
-    }
-
+  
     // Ler todos os clientes para uma lista ligada
     cliente* head = NULL;
     cliente* curr = NULL;
@@ -358,19 +352,12 @@ void alterarCliente() {
         atualizarCliente(&file, head);
 
         // atualizar os clientes no binário
-        atualizarBinCliente(&file, head);
+        atualizarBinCliente(&bin_file, head);
 
         system("clear || cls");
         printf("Cliente com ID %d alterado com sucesso!\n", id);
         getchar();
 
-        // Libertar a memória alocada para a lista ligada
-        curr = head;
-        while (curr != NULL) {
-            cliente* temp = curr;
-            curr = curr->seguinte;
-            free(temp);
-        }
     }
 }
 
@@ -386,13 +373,6 @@ void listarAluguerCliente(int id_cliente) {
     // Abrir ficheiros em modo de leitura
     txt_meios = fopen("meios.txt", "r");
 
-    if (txt_meios == NULL) {
-        system("clear || cls");
-        printf("Erro ao abrir arquivo!\n");
-        getchar();
-        exit(1);
-    }
-
     // Ler todos os meios para uma lista ligada
     meio* head_meio = NULL;
     meio* curr_meio = NULL;
@@ -401,12 +381,6 @@ void listarAluguerCliente(int id_cliente) {
 
     // Abrir ficheiros em modo de leitura
     txt_clientes = fopen("clientes.txt", "r");
-    if (txt_clientes == NULL) {
-        system("clear || cls");
-        printf("Erro ao abrir arquivo!\n");
-        getchar();
-        exit(1);
-    }
 
     // Ler todos os clientes para uma lista ligada
     cliente* head = NULL;
@@ -416,12 +390,6 @@ void listarAluguerCliente(int id_cliente) {
 
     // Abrir ficheiros em modo de escrita e leitura
     txt_registos = fopen("registos.txt", "ab+");
-    if (txt_registos == NULL) {
-        system("clear || cls");
-        printf("Erro ao abrir arquivo!\n");
-        getchar();
-        exit(1);
-    }
 
     // Ler todos os registos para uma lista ligada
     registo* head_registo = NULL;
@@ -463,29 +431,7 @@ void listarAluguerCliente(int id_cliente) {
         curr_registo->dia, curr_registo->mes, curr_registo->ano, curr_registo->horas, curr_registo->minutos);
         curr_registo = curr_registo->seguinte;
     }
-
-    // Libertar memória alocada para as listas ligadas
-    curr = head;
-    while (curr != NULL) {
-        cliente* temp = curr;
-        curr = curr->seguinte;
-        free(temp);
-    }
-
-    curr_meio = head_meio;
-    while (curr_meio != NULL) {
-        meio* temp = curr_meio;
-        curr_meio = curr_meio->seguinte;
-        free(temp);
-    }
-
-    curr_registo = head_registo;
-    while (curr_registo != NULL) {
-        registo* temp = curr_registo;
-        curr_registo = curr_registo->seguinte;
-        free(temp);
-    }
-    getchar();
+        getchar();
 }
 
 // Função para listar um meio
@@ -567,13 +513,6 @@ void terminarAluguer(int id_cliente) {
     // Abrir ficheiros em modo de leitura
     txt_meios = fopen("meios.txt", "r");
 
-    if (txt_meios == NULL) {
-        system("clear || cls");
-        printf("Erro ao abrir arquivo!\n");
-        getchar();
-        exit(1);
-    }
-
     // Ler todos os meios para uma lista ligada
     meio* head_meio = NULL;
     meio* curr_meio = NULL;
@@ -582,12 +521,6 @@ void terminarAluguer(int id_cliente) {
 
     // Abrir ficheiros em modo de leitura
     txt_clientes = fopen("clientes.txt", "r");
-    if (txt_clientes == NULL) {
-        system("clear || cls");
-        printf("Erro ao abrir arquivo!\n");
-        getchar();
-        exit(1);
-    }
 
     // Ler todos os clientes para uma lista ligada
     cliente* head = NULL;
@@ -597,12 +530,6 @@ void terminarAluguer(int id_cliente) {
 
     // Abrir ficheiros em modo de escrita e leitura
     txt_registos = fopen("registos.txt", "ab+");
-    if (txt_registos == NULL) {
-        system("clear || cls");
-        printf("Erro ao abrir arquivo!\n");
-        getchar();
-        exit(1);
-    }
 
     // Ler todos os registos para uma lista ligada
     registo* head_registo = NULL;
@@ -724,52 +651,26 @@ void terminarAluguer(int id_cliente) {
     }
 
     // atualizar os registos no binário
-    atualizarBinAluguer(&txt_registos, head_registo);
+    atualizarBinAluguer(&bin_registos, head_registo);
 
     // atualizar os meios no binário
-    atualizarBinMeio(&txt_meios, head_meio);
+    atualizarBinMeio(&bin_meios, head_meio);
 
     // atualizar os clientes no binário
-    atualizarBinCliente(&txt_clientes, head);
+    atualizarBinCliente(&bin_clientes, head);
 
     system("clear || cls");
     printf("Aluguer nao encontrado.\n");
     getchar();
 
-    // Libertar memória alocada para as listas ligadas
-    curr_registo = head_registo;
-    while (curr_registo != NULL) {
-        registo* temp = curr_registo;
-        curr_registo = curr_registo->seguinte;
-        free(temp);
-    }
-
-    curr_meio = head_meio;
-    while (curr_meio != NULL) {
-        meio* temp = curr_meio;
-        curr_meio = curr_meio->seguinte;
-        free(temp);
-    }
-
-    curr = head;
-    while (curr != NULL) {
-        cliente* temp = curr;
-        curr = curr->seguinte;
-        free(temp);
-    }
 }
 
 // Função para encontrar os meios disponíveis nas localizações encontradas
-void compararNomesVerticesCliente(grafo* g, meio* m, char** nomesVertices, int numVertices, const char* tipo_meio) {
+void mostrarMeiosCliente(grafo* g, meio* m, char** nomesVertices, int numVertices, const char* tipo_meio) {
+    
     // Abrir arquivo em modo de leitura
     FILE* txt_file = fopen("meios.txt", "r");
-    if (txt_file == NULL) {
-        system("clear || cls");
-        printf("Erro ao abrir arquivo!\n");
-        getchar();
-        exit(1);
-    }
-
+ 
     // Ler todos os meios para uma lista ligada
     meio* head = NULL;
     meio* curr = NULL;
@@ -814,12 +715,6 @@ void carregarSaldo(int id_cliente) {
 
     // Abrir ficheiros em modo de leitura
     txt_clientes = fopen("clientes.txt", "r");
-    if (txt_clientes == NULL) {
-        system("clear || cls");
-        printf("Erro ao abrir arquivo!\n");
-        getchar();
-        exit(1);
-    }
 
     // Ler todos os clientes para uma lista ligada
     cliente* head = NULL;
@@ -844,15 +739,8 @@ void carregarSaldo(int id_cliente) {
     atualizarCliente(&txt_clientes, head);
 
     // atualizar os clientes no binário
-    atualizarBinCliente(&txt_clientes, head);
+    atualizarBinCliente(&bin_clientes, head);
 
-    // Libertar memória alocada para as listas ligadas
-    curr = head;
-    while (curr != NULL) {
-        cliente* temp = curr;
-        curr = curr->seguinte;
-        free(temp);
-    }
 }
 
 // Menu para clientes

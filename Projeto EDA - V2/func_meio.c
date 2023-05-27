@@ -26,9 +26,7 @@ void registarMeio(meio** head, grafo** g) {
     // Encontrar o último ID presente no ficheiro e incrementá-lo
     while (fscanf(f, "%d %s %s %f %f %s %s %d\n", &id, nome, tipo, &custo, &bateria,
         local, local_grafo, &reserva) != EOF) {
-
     }
-
     id++;  // Incrementar o último ID encontrado
     fclose(f); // Fechar o ficheiro
 
@@ -68,7 +66,7 @@ void registarMeio(meio** head, grafo** g) {
     printf("\nDigite o ID correspondente a localizacao do meio: ");
     scanf("%d", &id_vert);
 
-    // Encontra o vértice com o ID escolhido e copia o respetivo nome
+    // Encontra o vértice com o ID escolhido e copia o respetivo nome e geocodigo
     v = (*g)->vertices;
     while (v != NULL) {
         if (v->id == id_vert) {
@@ -112,12 +110,19 @@ void registarMeio(meio** head, grafo** g) {
 
 // Função para passar os meios para uma lista ligada
 void lerMeios(FILE* f, meio** head) {
+    f = fopen("meios.txt", "r");
+    if (f == NULL) {
+        printf("Erro ao abrir arquivo!\n");
+        getchar();
+        exit(1);
+    }
     meio* current = NULL;
     while (!feof(f)) {
         meio* new_meio = (meio*)malloc(sizeof(meio));
         fscanf(f, "%d %s %s %f %f %s %s %d\n", &(new_meio->id), new_meio->nome, new_meio->tipo, &(new_meio->custo),
                &(new_meio->bateria), new_meio->local, new_meio->local_grafo, &(new_meio->reserva));
-        new_meio->seguinte = NULL;
+                 new_meio->seguinte = NULL;
+        
         if (*head == NULL) {
             *head = new_meio;
             current = new_meio;
@@ -132,14 +137,14 @@ void lerMeios(FILE* f, meio** head) {
 // Função para atualizar os meios no ficheiro
 void atualizarMeio(FILE** f, meio* head_meio) {
     // Abre o ficheiro para atualizar os valores
-    *f = fopen("meios.txt", "wb");
+    *f = fopen("meios.txt", "w");
     meio* curr_meio = head_meio;
 
     // Escreve os conteúdos de cada categoria
     while (curr_meio != NULL) {
         fprintf(*f, "%d %s %s %.2f %.2f %s %s %d\n", curr_meio->id, curr_meio->nome, curr_meio->tipo, curr_meio->custo,
             curr_meio->bateria, curr_meio->local, curr_meio->local_grafo, curr_meio->reserva);
-        curr_meio = curr_meio->seguinte;
+            curr_meio = curr_meio->seguinte;
     }
 
     fclose(*f);
@@ -153,14 +158,12 @@ void atualizarBinMeio(FILE** f, meio* head_meio) {
         getchar();
         exit(1);
     }
-
     meio* curr_meio = head_meio;
     while (curr_meio != NULL) {
         fwrite(curr_meio, sizeof(meio), 1, f);
-        curr_meio = curr_meio->seguinte;
+               curr_meio = curr_meio->seguinte;
     }
-
-    fclose(f);
+        fclose(f);
 }
 
 // Função para listar um meio
@@ -230,12 +233,6 @@ void removerMeio() {
         // Abrir ficheiros em modo de escrita e leitura
         FILE* txt_file = fopen("meios.txt", "r");
         FILE* bin_file = fopen("meios.bin", "ab+");
-        if (txt_file == NULL || bin_file == NULL) {
-            system("clear || cls");
-            printf("Erro ao abrir arquivo!\n");
-            getchar();
-            exit(1);
-        }
 
         // Ler todos os meios para uma lista ligada
         meio* head = NULL;
@@ -284,7 +281,7 @@ void removerMeio() {
             atualizarMeio(&txt_file, head);
 
             // atualizar os meios no binário
-            atualizarBinMeio(&txt_file, head);
+            atualizarBinMeio(&bin_file, head);
 
             system("clear || cls");
             printf("Meio com ID %d removido com sucesso!\n", id);
@@ -300,13 +297,7 @@ void alterarMeio(grafo** g) {
     // Abrir ficheiro em modo leitura
     FILE* file = fopen("meios.txt", "r");
     FILE* bin_file = fopen("meios.bin", "ab+");
-    if (file == NULL || bin_file == NULL) {
-        system("clear || cls");
-        printf("Erro ao abrir arquivo!\n");
-        getchar();
-        exit(1);
-    }
-
+ 
     // Ler todos os meios para uma lista ligada
     meio* head = NULL;
     meio* curr = NULL;
@@ -409,18 +400,11 @@ void alterarMeio(grafo** g) {
         atualizarMeio(&file, head);
 
         // atualizar os meios no ficheiro
-        atualizarBinMeio(&file, head);
+        atualizarBinMeio(&bin_file, head);
 
         system("clear || cls");
         printf("Meio com ID %d alterado com sucesso!\n", id);
         getchar();
 
-        // Libertar a memória alocada para a lista ligada
-        curr = head;
-        while (curr != NULL) {
-            meio* temp = curr;
-            curr = curr->seguinte;
-            free(temp);
-        }
     }
 }

@@ -83,7 +83,7 @@ void alterarCliente();
 void listarAluguerCliente(id_cliente);
 void listarMeioCliente(char order_by);
 void terminarAluguer(id_cliente);
-void compararNomesVerticesCliente(grafo* g, meio* m, char** nomesVertices, int numVertices, const char* tipo_meio);
+void mostrarMeiosCliente(grafo* g, meio* m, char** nomesVertices, int numVertices, const char* tipo_meio);
 void carregarSaldo(id_cliente);
 
 // FUNÇÕES GESTOR
@@ -118,8 +118,9 @@ void criarVertice(grafo* g);
 void editarVertice(grafo* g);
 void removerVertice(grafo* g);
 void imprimirVertices(grafo* g);
+void atualizarVertices(vertice* vertices);
 char* obterNomeVertice(grafo* g, int id_vertice);
-void compararNomesVertices(grafo* g, meio* m, char** nomesVertices, int numVertices, const char* tipo_meio);
+void mostrarMeios(grafo* g, meio* m, char** nomesVertices, int numVertices, const char* tipo_meio);
 void criarAresta(grafo* g);
 void removerAresta(aresta* a);
 void imprimirAresta(aresta* a);
