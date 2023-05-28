@@ -6,68 +6,68 @@
 #include <time.h>
 
 typedef struct cliente {
-    int id;
-    int nif;
-    char nome[50];
-    char utilizador[50];
-    char password[50];
-    char morada[50];
-    float saldo;
-    struct cliente* seguinte;
+	int id;
+	int nif;
+	char nome[50];
+	char utilizador[50];
+	char password[50];
+	char morada[50];
+	float saldo;
+	struct cliente* seguinte;
 } cliente;
 
 typedef struct gestor {
-    int id;
-    char nome[50];
-    char utilizador[50];
-    char password[50];
-    struct gestor* seguinte;
+	int id;
+	char nome[50];
+	char utilizador[50];
+	char password[50];
+	struct gestor* seguinte;
 } gestor;
 
 typedef struct meio {
-    int id;
-    int reserva;
-    float custo;
-    float bateria;
-    char nome[50];
-    char tipo[50];
-    char local[50];
-    char local_grafo[50];
-    struct meio* seguinte;
+	int id;
+	int reserva;
+	float custo;
+	float bateria;
+	char nome[50];
+	char tipo[50];
+	char local[50];
+	char local_grafo[50];
+	struct meio* seguinte;
 } meio;
 
 typedef struct registo {
-    int id;
-    int cliente_id;
-    int meio_id;
-    int dia;
-    int mes;
-    int ano;
-    int horas;
-    int minutos;
-    struct registo* seguinte;
+	int id;
+	int cliente_id;
+	int meio_id;
+	int dia;
+	int mes;
+	int ano;
+	int horas;
+	int minutos;
+	struct registo* seguinte;
 } registo;
 
 typedef struct aresta {
-    int id_origem;      // id do vértice de origem
-    int id_destino;     // id do vértice de destino
-    int peso;
-    struct aresta* proxima;
+	int id_origem;      // id do vértice de origem
+	int id_destino;     // id do vértice de destino
+	int peso;
+	struct aresta* proxima;
 } aresta;
 
 typedef struct vertice {
-    int id;
-    char nome[50];
-    char local_meio[50];
-    meio* meios;
-    aresta* arestas; 
-    struct vertice* seguinte;
+	int id;
+	char nome[50];
+	char local_meio[50];
+	meio* meios;
+	aresta* arestas;
+	struct vertice* seguinte;
 } vertice;
 
 typedef struct grafo {
-    int num_vertices;
-    int num_arestas;
-    vertice* vertices;
+	int num_vertices;
+	int num_arestas;
+	vertice* vertices;
 } grafo;
 
 // FUNÇÕES CLIENTE
@@ -82,6 +82,7 @@ void removerCliente();
 void alterarCliente();
 void listarAluguerCliente(id_cliente);
 void listarMeioCliente(char order_by);
+void listarHistoricoCliente(int id_cliente);
 void terminarAluguer(id_cliente);
 void mostrarMeiosCliente(grafo* g, meio* m, char** nomesVertices, int numVertices, const char* tipo_meio);
 void carregarSaldo(id_cliente);
@@ -134,10 +135,13 @@ void imprimirConexao(int id_origem, int destino, float distancia, int* caminho, 
 
 // FUNÇÕES ALUGUER
 void registarAluguer(int id_cliente, registo** head);
+void salvarAluguer(registo* new_registo);
+int encontraID();
 void lerAluguer(FILE* f, registo** head);
 void atualizarAluguer(FILE** f, registo* head_registo);
 void atualizarBinAluguer(FILE** f, registo* head_registo);
 void listarAluguer();
+void listarHistorico();
 void cancelarAluguer();
 
 // FUNÇÕES MENU
